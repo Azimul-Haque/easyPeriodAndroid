@@ -1,1 +1,54 @@
 /* Empty. Add your own CSS if you like */
+
+.loading{
+    background-color: inherit;
+    width: 75% !important;
+    border-width: 2px !important;
+    border-color: black !important;
+    border-style: solid !important;
+}
+
+.periodEntryCard{
+    background-color: #EF473A;
+    color: #ffffff;
+    font-weight: bold !important;
+}
+.bloddColor{
+    color: #ffffff;
+}
+.periodCalendarCard{
+    background-color: #387EF5;
+    color: #ffffff;
+    font-weight: bold !important;
+}
+.calendarColor{
+    color: #ffffff;
+}
+.periodListCard{
+    background-color: #33CD5F;
+    color: #000000;
+    font-weight: bold;
+}
+.profileCard{
+    background-color: #FFC900;
+    color: #000000;
+    font-weight: bold;
+}
+a{
+    text-decoration: none !important;
+}
+.home{
+    color: #006064;
+}
+.waterdrop{
+    color: #EF473A;
+}
+.calendar{
+    color: #387EF5;
+}
+.clipboard{
+    color: #33CD5F;
+}
+.compose{
+    color: #FFC900;
+}

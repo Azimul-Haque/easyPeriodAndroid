@@ -19,21 +19,35 @@ angular.module('starter.controllers', [])
     //toaster.pop('note', title, message);
   };
 
+  // Create the register modal that we will use later
+  $ionicModal.fromTemplateUrl('templates/register.html', {
+    scope: $scope
+  }).then(function(modalReg) {
+    $scope.modalReg = modalReg;
+  });
+  // Triggered in the login modal to close it
+  $scope.closeRegister = function() {
+    $scope.modalReg.hide();
+  };
+  // Open the login modal
+  $scope.register = function() {
+    $scope.modalReg.show();
+  };
+
+
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope
-  }).then(function(modal) {
-    $scope.modal = modal;
+  }).then(function(modalLogin) {
+    $scope.modalLogin = modalLogin;
   });
-
   // Triggered in the login modal to close it
   $scope.closeLogin = function() {
-    $scope.modal.hide();
+    $scope.modalLogin.hide();
   };
-
   // Open the login modal
   $scope.login = function() {
-    $scope.modal.show();
+    $scope.modalLogin.show();
   };
 
   //logout function

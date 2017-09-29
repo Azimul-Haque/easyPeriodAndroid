@@ -3,7 +3,7 @@
 .loading{
     background-color: inherit;
     width: 75% !important;
-    border-width: 2px !important;
+    border-width: 0px !important;
     border-color: black !important;
     border-style: solid !important;
 }
@@ -51,4 +51,31 @@ a{
 }
 .compose{
     color: #FFC900;
+}
+
+
+
+
+
+/* 
+    loader css
+*/
+.loader {
+  border: 5px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 5px solid #808080;
+  width: 40px;
+  height: 40px;
+  -webkit-animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

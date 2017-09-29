@@ -1,6 +1,24 @@
 <ion-view view-title="Entry Period">
     <ion-content>
-        <h1>Entry Period</h1>
+        <form ng-submit="">
+            <div class="list">
+                <label class="item item-input item-floating-label">
+                    <span class="input-label">Starting Date</span>
+                    <input type="text" placeholder="Starting Date" ng-focus="openDatePicker1()" ng-model="startDate">
+                </label>
+                <label class="item item-input item-floating-label">
+                    <span class="input-label">End Date</span>
+                    <input type="text" placeholder="End Date" ng-focus="openDatePicker2()" ng-model="endDate">
+                </label>
+                <label class="item item-input item-floating-label">
+                    <span class="input-label">Description (Optional)</span>
+                    <input type="text" placeholder="Description (Optional)">
+                </label>
+                <label class="item">
+                    <button class="button button-block button-positive" type="submit">Save</button>
+                </label>    
+            </div>
+        </form>
     </ion-content>
 </ion-view>
       

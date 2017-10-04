@@ -52,7 +52,25 @@ a{
 .compose{
     color: #FFC900;
 }
-
+.fc-scroller {
+    overflow-y: hidden !important;
+ }
+ .ui-calendar{
+     padding: 10px;
+ }
+ .fc-center h2{
+    font-size: 24px;
+ }
+ .fc-event {
+    position: relative;
+    display: block;
+    font-size: .85em;
+    line-height: 1.3;
+    border-radius: 0px;
+    border: 1px solid #ef473a;
+    background-color: #ef473a;
+    font-weight: 400;
+}
 
 
 
@@ -61,9 +79,9 @@ a{
     loader css
 */
 .loader {
-  border: 5px solid #f3f3f3;
+  border: 4px solid #f3f3f3 !important;
   border-radius: 50%;
-  border-top: 5px solid #808080;
+  border-top: 4px solid #808080 !important;
   width: 40px;
   height: 40px;
   -webkit-animation: spin 1s linear infinite;

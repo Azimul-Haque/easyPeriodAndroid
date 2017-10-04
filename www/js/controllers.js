@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope,toaster,$ionicModal,$timeout,$http,$rootScope,$ionicPopup,$state,$ionicHistory,$ionicLoading) {
+.controller('AppCtrl', function($scope,toaster,$timeout,ionicMaterialInk,ionicMaterialMotion,$ionicModal,$timeout,$http,$rootScope,$ionicPopup,$state,$ionicHistory,$ionicLoading) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -10,6 +10,12 @@ angular.module('starter.controllers', [])
   //});
   // loads value from the loggedin session
   // Form data for the login modal
+
+  $timeout(function () {
+    ionicMaterialInk.displayEffect();
+    ionicMaterialMotion.ripple();
+    ionicMaterialMotion.fadeSlideInRight();
+  }, 300); 
   $scope.user = {};
   $scope.newuser = {};
 
@@ -33,6 +39,7 @@ angular.module('starter.controllers', [])
   // Open the register modal
   $scope.register = function() {
     $scope.modalReg.show();
+    ionicMaterialInk.displayEffect();
   };
 
 
@@ -49,6 +56,7 @@ angular.module('starter.controllers', [])
   // Open the login modal
   $scope.login = function() {
     $scope.modalLogin.show();
+    ionicMaterialInk.displayEffect();
   };
 
   //logout function
@@ -178,7 +186,7 @@ angular.module('starter.controllers', [])
   $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
 })
 
-.controller('PeriodListCtrl', function($scope,$http,$rootScope,$ionicHistory,$state,$ionicPopup) {  
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
   // loads value from the loggedin session
   $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
@@ -193,12 +201,23 @@ angular.module('starter.controllers', [])
       });
     } else {
       $http.get("http://localhost/angular_server1/customers_sql.php")
-      .then(function (response) {$scope.periods = response.data.records;});
+      .then(function (response) {
+        $scope.periods = response.data;
+        console.log($scope.periods);
+      });
     }
-    
+    $timeout(function () {
+      ionicMaterialInk.displayEffect();
+      //ionicMaterialMotion.ripple();
+      ionicMaterialMotion.fadeSlideInRight();
+    }, 300);
 })
 
-.controller('EntryPeriodCtrl', function($scope, $stateParams, ionicDatePicker, $filter) {
+.controller('EntryPeriodCtrl', function($scope, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion) {
+  $timeout(function () {
+    ionicMaterialInk.displayEffect();
+    ionicMaterialMotion.ripple();
+  }, 300);
   var ipObj1 = {
     callback: function (val) {  //Mandatory
       console.log('Return value from the datepicker popup is : ' + val, new Date(val));
@@ -206,7 +225,7 @@ angular.module('starter.controllers', [])
     },
     inputDate: new Date(),      //Optional
     sundayFirst: true,          //Optional
-    disableWeekdays: [0],       //Optional
+    disableWeekdays: [],       //Optional
     closeOnSelect: true,       //Optional
     templateType: 'popup'       //Optional
   };
@@ -221,23 +240,76 @@ angular.module('starter.controllers', [])
     },
     inputDate: new Date(),      //Optional
     sundayFirst: true,          //Optional
-    disableWeekdays: [0],       //Optional
+    disableWeekdays: [],       //Optional
     closeOnSelect: true,       //Optional
-    templateType: 'popup',       //Optional
-    dateFormat: 'dd MMMM yyyy'
+    templateType: 'popup'       //Optional
   };
   $scope.openDatePicker2 = function(){
     ionicDatePicker.openDatePicker(ipObj2);
   };
+})
+.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout',function($scope, $http, $stateParams,$ionicPopup, $timeout) {
+  $calendar = $('[ui-calendar]');
+  var date = new Date(),
+  d = date.getDate(),
+  m = date.getMonth(),
+  y = date.getFullYear();    
+  /* config object */
+  $scope.uiConfig = {
+    calendar: {
+      fixedWeekCount: true,
+      aspectRatio: 1,
+      editable: false,
+      selectable: true,
+      header: {
+      left: 'prev',
+      center: 'title',
+      right: 'next',
+      stick : true,
+      },
+      eventClick: function(date, jsEvent, view) {
+        var alertPopup = $ionicPopup.alert({
+          title: date.start + '-' + date.end,
+          template: date.title
+        });
+      },
+      dayClick: $scope.alertEventOnClick,
+      eventDrop: $scope.alertOnDrop,
+      eventResize: $scope.alertOnResize,
+      eventRender: $scope.eventRender
+    }
+  };
+  $scope.events = [];
+
+  $http.get("http://localhost/angular_server1/customers_sql.php")
+  .then(function (data) {
+    //console.log(data);
+    $scope.events.slice(0, $scope.events.length);
+    angular.forEach(data.data, function(value){
+      $scope.events.push({
+        title: value.title,
+        start: new Date(value.start),
+        end: new Date(value.end),
+        allDay: true,
+        stick: true
+      });
+    });
+  });
+  console.log($scope.events);
+  $scope.eventSources = [$scope.events];  
+}])
+.controller('PlaylistCtrl', function($scope, $stateParams, ionicMaterialInk,ionicMaterialMotion) {
+ 
+})
+.controller('ProfileCtrl', function($scope, $stateParams, ionicMaterialInk,ionicMaterialMotion) {
 
 })
-.controller('PeriodCalendarCtrl', function($scope, $stateParams) {
-})
-.controller('PlaylistCtrl', function($scope, $stateParams) {
-})
-.controller('ProfileCtrl', function($scope, $stateParams) {
-})
-.controller('WelcomeCtrl', function($scope,$rootScope,$ionicHistory,$state) {  
+.controller('WelcomeCtrl', function($scope,$timeout,$rootScope,$ionicHistory,$state, ionicMaterialInk,ionicMaterialMotion) {
+  $timeout(function () {
+    ionicMaterialInk.displayEffect();
+    //ionicMaterialMotion.ripple();
+    //ionicMaterialMotion.fadeSlideInRight();
+  }, 300); 
   // loads value from the loggedin session
   $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');

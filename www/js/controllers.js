@@ -186,34 +186,8 @@ angular.module('starter.controllers', [])
   $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
 })
 
-.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
-  // loads value from the loggedin session
-  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
-  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
 
-    if(!sessionStorage.getItem('loggedin_name')){   
-      //if not logged in
-      $state.go('app.welcome', {}, {location: "replace", reload: true});
-      var alertPopup = $ionicPopup.alert({
-        title: 'Error!',
-        template: 'Please login first!'
-      });
-    } else {
-      $http.get("http://localhost/angular_server1/customers_sql.php")
-      .then(function (response) {
-        $scope.periods = response.data;
-        console.log($scope.periods);
-      });
-    }
-    $timeout(function () {
-      ionicMaterialInk.displayEffect();
-      //ionicMaterialMotion.ripple();
-      ionicMaterialMotion.fadeSlideInRight();
-    }, 300);
-})
-
-.controller('EntryPeriodCtrl', function($scope, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion) {
+.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion) {
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     ionicMaterialMotion.ripple();
@@ -247,7 +221,54 @@ angular.module('starter.controllers', [])
   $scope.openDatePicker2 = function(){
     ionicDatePicker.openDatePicker(ipObj2);
   };
+
+  $scope.url = 'http://localhost/angular_server1/entryperiod.php';
+  $scope.formsubmit = function(isValid) {
+      if (isValid) {
+          $http.post($scope.url, {"startDate": $scope.startDate, "endDate": $scope.endDate, "description": $scope.description}).
+                  success(function(data, status) {
+                      console.log(data.result);
+                      $scope.status = status;
+                      $scope.data = data;
+                      $scope.result = data.result; // Show result from server in our <pre></pre> element
+                  }).error(function(error, status){
+                      $scope.status = status;
+                      $scope.result = error;
+                      console.log($scope.result);
+                      console.log($scope.status);
+                  });
+      }else{  
+            $scope.result = {"error":"Something is wrong! Try again."};
+      }
+  }
+}])
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
+  // loads value from the loggedin session
+  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
+  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
+
+    if(!sessionStorage.getItem('loggedin_name')){   
+      //if not logged in
+      $state.go('app.welcome', {}, {location: "replace", reload: true});
+      var alertPopup = $ionicPopup.alert({
+        title: 'Error!',
+        template: 'Please login first!'
+      });
+    } else {
+      $http.get("http://localhost/angular_server1/customers_sql.php")
+      .then(function (response) {
+        $scope.periods = response.data;
+        console.log($scope.periods);
+      });
+    }
+    $timeout(function () {
+      ionicMaterialInk.displayEffect();
+      //ionicMaterialMotion.ripple();
+      ionicMaterialMotion.fadeSlideInRight();
+    }, 300);
 })
+
 .controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout',function($scope, $http, $stateParams,$ionicPopup, $timeout) {
   $calendar = $('[ui-calendar]');
   var date = new Date(),

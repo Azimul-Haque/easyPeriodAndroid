@@ -186,15 +186,18 @@ angular.module('starter.controllers', [])
   $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
 })
 
+<<<<<<< HEAD
 
 .controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion) {
+=======
+.controller('EntryPeriodCtrl', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion,$ionicHistory) {
+>>>>>>> 38549afb3343c9d1386afbdaa9818119884f2490
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     ionicMaterialMotion.ripple();
   }, 300);
   var ipObj1 = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + val, new Date(val));
       $scope.startDate = $filter('date')(val, "MMMM dd, yyyy"); 
     },
     inputDate: new Date(),      //Optional
@@ -206,10 +209,8 @@ angular.module('starter.controllers', [])
   $scope.openDatePicker1 = function(){
     ionicDatePicker.openDatePicker(ipObj1);
   };
-
   var ipObj2 = {
     callback: function (val) {  //Mandatory
-      console.log('Return value from the datepicker popup is : ' + val, new Date(val));
       $scope.endDate = $filter('date')(val, "MMMM dd, yyyy"); 
     },
     inputDate: new Date(),      //Optional
@@ -222,15 +223,28 @@ angular.module('starter.controllers', [])
     ionicDatePicker.openDatePicker(ipObj2);
   };
 
+<<<<<<< HEAD
   $scope.url = 'http://localhost/angular_server1/entryperiod.php';
   $scope.formsubmit = function(isValid) {
       if (isValid) {
           $http.post($scope.url, {"startDate": $scope.startDate, "endDate": $scope.endDate, "description": $scope.description}).
                   success(function(data, status) {
+=======
+  $scope.loggedin_name = sessionStorage.getItem('loggedin_name');
+  $scope.loggedin_id = sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
+  
+  $scope.url = 'http://localhost/angular_server1/entryperiod.php';
+  $scope.formsubmit = function(isValid) {
+      if (isValid) {
+          $http.post($scope.url, {"user_id": 1,"start": $scope.startDate, "end": $scope.endDate, "description": $scope.description})
+                  .success(function(data, status) {
+>>>>>>> 38549afb3343c9d1386afbdaa9818119884f2490
                       console.log(data.result);
                       $scope.status = status;
                       $scope.data = data;
                       $scope.result = data.result; // Show result from server in our <pre></pre> element
+<<<<<<< HEAD
                   }).error(function(error, status){
                       $scope.status = status;
                       $scope.result = error;
@@ -242,6 +256,21 @@ angular.module('starter.controllers', [])
       }
   }
 }])
+=======
+                      console.log(status);
+                  }).error(function(error, status) {  					
+                      $scope.status = status;
+                      console.log(error);
+                      console.log($scope.status);
+                  });
+      } else{  
+            $scope.result = {"error":"Something is wrong! Try again."};
+      }
+  }
+  
+})
+
+>>>>>>> 38549afb3343c9d1386afbdaa9818119884f2490
 .controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
   // loads value from the loggedin session
   $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
@@ -319,9 +348,7 @@ angular.module('starter.controllers', [])
   console.log($scope.events);
   $scope.eventSources = [$scope.events];  
 }])
-.controller('PlaylistCtrl', function($scope, $stateParams, ionicMaterialInk,ionicMaterialMotion) {
- 
-})
+
 .controller('ProfileCtrl', function($scope, $stateParams, ionicMaterialInk,ionicMaterialMotion) {
 
 })

@@ -51,6 +51,7 @@ angular.module('starter', ['ionic', 'starter.controllers','toaster', 'ionic-date
   })
   .state('app.periodcalendar', {
     url: '/periodcalendar',
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: 'templates/periodcalendar.html',

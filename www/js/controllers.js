@@ -187,14 +187,28 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion) {
+.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory) {
+  // loads value from the loggedin session
+  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
+  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
+  $scope.formSubmission = {};
+  $scope.successToast = function(title, message){
+    toaster.pop('success', title, message);
+    // toaster.pop('error', title, message);
+    // toaster.pop('warning', title, message);
+    //toaster.pop('note', title, message);
+  };
+  $scope.errorToast = function(title, message){
+    toaster.pop('error', title, message);
+  };
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     ionicMaterialMotion.ripple();
   }, 300);
   var ipObj1 = {
     callback: function (val) {  //Mandatory
-      $scope.startDate = $filter('date')(val, "MMMM dd, yyyy"); 
+      $scope.formSubmission.startDate = $filter('date')(val, "MMMM dd, yyyy"); 
     },
     inputDate: new Date(),      //Optional
     sundayFirst: true,          //Optional
@@ -207,7 +221,7 @@ angular.module('starter.controllers', [])
   };
   var ipObj2 = {
     callback: function (val) {  //Mandatory
-      $scope.endDate = $filter('date')(val, "MMMM dd, yyyy"); 
+      $scope.formSubmission.endDate = $filter('date')(val, "MMMM dd, yyyy"); 
     },
     inputDate: new Date(),      //Optional
     sundayFirst: true,          //Optional
@@ -218,22 +232,26 @@ angular.module('starter.controllers', [])
   $scope.openDatePicker2 = function(){
     ionicDatePicker.openDatePicker(ipObj2);
   };
-
+  
   $scope.url = 'http://localhost/angular_server1/entryperiod.php';
   $scope.formsubmit = function(isValid) {
       if (isValid) {
-          $http.post($scope.url, {"startDate": $scope.startDate, "endDate": $scope.endDate, "description": $scope.description}).
-                  success(function(data, status) {
-
+          $http.post($scope.url, {"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.startDate, "endDate": $scope.formSubmission.endDate, "description": $scope.formSubmission.description})
+                  .success(function(data, status) {
+                      console.log($scope.formSubmission.description);
                       console.log(data.result);
                       $scope.status = status;
                       $scope.data = data;
                       $scope.result = data.result; // Show result from server in our <pre></pre> element
+                      $scope.successToast('SUCCESS', 'Data entered successfully!');
+                      // there will be a redirect from here...
                   }).error(function(error, status){
                       $scope.status = status;
                       $scope.result = error;
+                      console.log($scope.formSubmission.description);
                       console.log($scope.result);
                       console.log($scope.status);
+                      $scope.errorToast('ERROR', 'Something is wrong! Try again.');
                   });
       }else{  
             $scope.result = {"error":"Something is wrong! Try again."};
@@ -268,7 +286,7 @@ angular.module('starter.controllers', [])
     }, 300);
 })
 
-.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout',function($scope, $http, $stateParams,$ionicPopup, $timeout) {
+.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state) {
   $calendar = $('[ui-calendar]');
   var date = new Date(),
   d = date.getDate(),
@@ -310,13 +328,14 @@ angular.module('starter.controllers', [])
         title: value.title,
         start: new Date(value.start),
         end: new Date(value.end),
-        allDay: true,
+        allDay: false,
         stick: true
       });
     });
   });
   console.log($scope.events);
-  $scope.eventSources = [$scope.events];  
+  $scope.eventSources = [$scope.events];
+
 }])
 
 .controller('ProfileCtrl', function($scope, $stateParams, ionicMaterialInk,ionicMaterialMotion) {

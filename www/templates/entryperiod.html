@@ -1,18 +1,18 @@
 <ion-view view-title="Entry Period">
     <ion-content>
-        <form name="entryPeriodForm">
+        <form name="entryPeriodForm" method="POST">
             <div class="list animate-ripple">
                 <label class="item item-input item-floating-label">
                     <span class="input-label">Starting Date</span>
-                    <input type="text" placeholder="Starting Date" ng-focus="openDatePicker1()" ng-model="startDate" required>
+                    <input type="text" placeholder="Starting Date" ng-focus="openDatePicker1()" ng-model="formSubmission.startDate" required>
                 </label>
                 <label class="item item-input item-floating-label">
                     <span class="input-label">End Date</span>
-                    <input type="text" placeholder="End Date" ng-focus="openDatePicker2()" ng-model="endDate">
+                    <input type="text" placeholder="End Date" ng-focus="openDatePicker2()" ng-model="formSubmission.endDate">
                 </label>
                 <label class="item item-input item-floating-label">
                     <span class="input-label">Description (Optional)</span>
-                    <input type="text" placeholder="Description (Optional)" ng-model="description">
+                    <input type="text" placeholder="Description (Optional)" ng-model="formSubmission.description">
                 </label>
                 <label class="item">
                     <button class="button button-block button-positive button-balanced ink" type="submit" ng-click="formsubmit(entryPeriodForm.$valid)">Save</button>

@@ -71,6 +71,10 @@ a{
     background-color: #ef473a;
     font-weight: 400;
 }
+.fc-time{
+    display : none; /* allDay false retrured a 12a type label, to not to display use this css */
+ }
+ 
 
 
 

@@ -265,6 +265,22 @@ angular.module('starter.controllers', [])
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
   $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
 
+  $scope.showButtons = false;
+  $scope.showButtonF = function() {
+    return $scope.showButtons = !$scope.showButtons;
+  }
+  $scope.doTest1 = function(var1) {
+    var alertPopup = $ionicPopup.alert({
+      title: var1,
+      template: 'Please Test first!'
+    });
+  }
+  $scope.doTest2 = function() {
+    var alertPopup = $ionicPopup.alert({
+      title: 'Test 2!',
+      template: 'Please Test first!'
+    });
+  }
     if(!sessionStorage.getItem('loggedin_name')){   
       //if not logged in
       $state.go('app.welcome', {}, {location: "replace", reload: true});

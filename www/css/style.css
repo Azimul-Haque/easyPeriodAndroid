@@ -74,6 +74,36 @@ a{
 .fc-time{
     display : none; /* allDay false retrured a 12a type label, to not to display use this css */
  }
+ .delete-button, .edit-button{
+    background: none !important;
+    color: inherit;
+    border: none;
+    padding: 10px !important;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit !important;
+    box-shadow: none !important;
+ }
+ .edit-button {
+     color: #387EF5 !important;
+ }
+ .list-left-editing .item-left-editable .item-content, .item-left-editing.item-left-editable .item-content {
+   -webkit-transform: translate3d(80px, 0, 0) !important;
+   -moz-transform: translate3d(80px, 0, 0)  !important;
+   transform: translate3d(80px, 0, 0)!important;
+ }
+ .item-left-edit:nth-child(2){
+    left:40px !important;
+}
+ .item {
+     border-bottom: 1px solid lightgray !important;
+ }
+ .profile-picture{
+    border-radius: 50%;
+    margin: auto;
+    height: 80px;
+    width: 80px;
+ }
  
 
 

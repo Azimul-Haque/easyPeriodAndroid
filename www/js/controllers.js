@@ -259,28 +259,37 @@ angular.module('starter.controllers', [])
   }
 }])
       
-.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
   // loads value from the loggedin session
   $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
   $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
 
   $scope.showButtons = false;
-  $scope.showButtonF = function() {
+  $scope.showButtonSettings = function() {
     return $scope.showButtons = !$scope.showButtons;
   }
-  $scope.doTest1 = function(var1) {
-    var alertPopup = $ionicPopup.alert({
-      title: var1,
-      template: 'Please Test first!'
-    });
-  }
-  $scope.doTest2 = function() {
-    var alertPopup = $ionicPopup.alert({
-      title: 'Test 2!',
-      template: 'Please Test first!'
-    });
-  }
+
+  // Create the register modal that we will use later
+  $ionicModal.fromTemplateUrl('templates/editperiod.html', {
+    scope: $scope
+  }).then(function(modalEditPeriod) {
+    $scope.modalEditPeriod = modalEditPeriod;
+  });
+  // Triggered in the register modal to close it
+  $scope.closeEditPeriod = function() {
+    $scope.modalEditPeriod.hide();
+  };
+  // Open the register modal
+  $scope.editPeriod = function(period) {
+    $scope.modalEditPeriod.show();
+    $scope.period = period;
+    $timeout(function () {
+      ionicMaterialInk.displayEffect();
+      ionicMaterialMotion.ripple();
+    }, 300);
+  };
+
     if(!sessionStorage.getItem('loggedin_name')){   
       //if not logged in
       $state.go('app.welcome', {}, {location: "replace", reload: true});
@@ -289,10 +298,17 @@ angular.module('starter.controllers', [])
         template: 'Please login first!'
       });
     } else {
-      $http.get("http://localhost/angular_server1/customers_sql.php")
+      $http.get("http://localhost/angular_server1/getPeriodList.php?id="+$scope.loggedin_id)
       .then(function (response) {
         $scope.periods = response.data;
         console.log($scope.periods);
+      },
+      function(error) {
+        $scope.error = error;
+        var alertPopup = $ionicPopup.alert({
+          title: 'Test 2!',
+          template: $scope.error
+        });
       });
     }
     $timeout(function () {
@@ -303,6 +319,10 @@ angular.module('starter.controllers', [])
 })
 
 .controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state) {
+  // loads value from the loggedin session
+  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
+  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
   $calendar = $('[ui-calendar]');
   var date = new Date(),
   d = date.getDate(),
@@ -335,7 +355,7 @@ angular.module('starter.controllers', [])
   };
   $scope.events = [];
 
-  $http.get("http://localhost/angular_server1/customers_sql.php")
+  $http.get("http://localhost/angular_server1/getPeriodList.php?id="+$scope.loggedin_id)
   .then(function (data) {
     //console.log(data);
     $scope.events.slice(0, $scope.events.length);

@@ -6,7 +6,7 @@
     </ion-nav-buttons>
     <ion-nav-buttons side="right">
       <div class="">
-        <button class="button button-icon button-clear ion-gear-b" ng-click="showButtonF()"></button>
+        <button class="button button-icon button-clear ion-gear-b" ng-click="showButtonSettings()"></button>
       </div>
     </ion-nav-buttons>
     
@@ -14,9 +14,9 @@
   <ion-content ng-class="{expanded:isExpanded}">
     <ion-list class="animate-fade-slide-in-right" show-delete="showButtons">
       <ion-item ng-repeat="period in periods"  class="item item-text-wrap  item-button-right">
-        {{period.start}}
-          <ion-delete-button class="icon ion-trash-a delete-button ink" ng-click="doTest1(period.start)"></ion-delete-button>
-          <ion-delete-button class="icon ion-compose edit-button ink" ng-click="doTest2()"></ion-delete-button>
+        <b>{{period.id}}.</b> {{period.start}}
+          <ion-delete-button class="icon ion-trash-a delete-button ink" ng-click=""></ion-delete-button>
+          <ion-delete-button class="icon ion-compose edit-button ink" ng-click="editPeriod(period)"></ion-delete-button>
           <!-- <ion-option-button class="button-assertive"
                              ng-click="">
             <i class="icon ion-compose"></i>

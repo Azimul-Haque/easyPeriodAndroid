@@ -1,6 +1,6 @@
-<ion-view view-title="Easy Period">
+<ion-view view-title="Easy Period" cache-view="false">
   <ion-content class="">
-    <div class="row">
+    <div class="row" ng-show="showHomePageItems">
         <a menu-close class="col col-50" ui-sref="app.entryperiod">
           <div class="card text-center periodEntryCard ink">
             <h1><i class="icon ion-waterdrop bloddColor"></i></h1> New Period
@@ -12,7 +12,7 @@
           </div>
         </a>
     </div>
-    <div class="row">
+    <div class="row" ng-show="showHomePageItems">
         <a menu-close class="col col-50" ui-sref="app.periodlist">
           <div class="card text-center periodListCard ink">
             <h1><i class="icon ion-clipboard"></i></h1> Period List
@@ -23,6 +23,13 @@
             <h1><i class="icon ion-compose"></i></h1> Profile
           </div>
         </a>
+    </div>
+    <div class="card" ng-show="!showHomePageItems">
+      <center style="padding: 20px;">
+        <h4>You need to login first</h4>
+        <button class="button button-positive button-block ink" ng-click="login()"><i class="icon ion-log-in"></i> Login</button>
+        <button class="button button-balanced button-block ink" ng-click="register()"><i class="icon ion-android-person-add"></i> Register</button>
+      </center>
     </div>
   </ion-content>
 </ion-view>

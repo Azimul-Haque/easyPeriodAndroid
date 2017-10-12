@@ -1,20 +1,20 @@
 <ion-view view-title="Profile">
     <ion-content>
-        <div class="list card">
+        <div class="list card animate-fade-slide-in-right">
 
-        <div class="item ink">
-            <img class="profile-picture" src="img/demo_user.jpg"><br/>
-            <center><h2>Marty McFly</h2>
-            <p>November 05, 1955</p></center>
-        </div>
+            <div class="item ink">
+                <img class="profile-picture" src="img/demo_user.jpg"><br/>
+                <center><h2>{{ loggedin_name }}</h2>
+                <p>{{ loggedin_email }}</p>
+            </center>
+            </div>
 
-        <div class="item item-body">
-            <p> <b>Joined:</b> November 05, 1955</p>
-            <p> <b>LMP Date:</b> November 05, 1955</p>
-            <p> <b>Last entry:</b> November 05, 1955</p>
-            <p> <b>Total entry:</b> 21</p>
-        </div>
-
+            <div class="item item-body animate-fade-slide-in-right">
+                <p> <b>Joined:</b> {{ loggedin_created_at | limitTo: 10 | date: "MMMM dd, y" }}</p>
+                <p> <b>LMP Date:</b> November 05, 1955</p>
+                <p> <b>Last entry:</b> November 05, 1955</p>
+                <p> <b>Total entry:</b> 21</p>
+            </div>
         </div>
     </ion-content>
 </ion-view>

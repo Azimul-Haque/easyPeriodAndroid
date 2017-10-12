@@ -1,4 +1,4 @@
-<ion-modal-view>
+<ion-modal-view ng-controller="EditPeriodCtrl">
     <ion-header-bar class="bar-assertive">
       <h1 class="title">Edit Period</h1>
       <div class="buttons">
@@ -6,22 +6,23 @@
       </div>
     </ion-header-bar>
     <ion-content>
-        <form name="" method="POST">
+        <form name="entryPeriodForm" method="POST">
             <div class="list animate-ripple">
+                <input type="hidden" ng-model="formSubmission.id" required>
                 <label class="item item-input item-floating-label">
                     <span class="input-label">Starting Date</span>
-                    <input type="text" placeholder="Starting Date" ng-focus="" ng-model="period.start" required>
+                    <input type="text" placeholder="Starting Date" ng-focus="openDatePicker3()" ng-model="formSubmission.start" required>
                 </label>
                 <label class="item item-input item-floating-label">
                     <span class="input-label">End Date</span>
-                    <input type="text" placeholder="End Date" ng-focus="" ng-model="period.end">
+                    <input type="text" placeholder="End Date" ng-focus="openDatePicker4()" ng-model="formSubmission.end">
                 </label>
                 <label class="item item-input item-floating-label">
                     <span class="input-label">Description (Optional)</span>
-                    <input type="text" placeholder="Description (Optional)" ng-model="period.title">
+                    <input type="text" placeholder="Description (Optional)" ng-model="formSubmission.title">
                 </label>
                 <label class="item">
-                    <button class="button button-block button-positive button-balanced ink" type="submit" ng-click="">Save</button>
+                    <button class="button button-block button-positive button-balanced ink" type="submit" ng-click="formsubmitUpdate(entryPeriodForm.$valid)">Save</button>
                 </label>    
             </div>
         </form>

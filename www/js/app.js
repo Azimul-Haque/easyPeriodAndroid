@@ -33,6 +33,7 @@ angular.module('starter', ['ionic', 'starter.controllers','toaster', 'ionic-date
 
   .state('app.welcome', {
     url: '/welcome',
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: 'templates/welcome.html',
@@ -69,6 +70,15 @@ angular.module('starter', ['ionic', 'starter.controllers','toaster', 'ionic-date
       }
     }
   })
+  // .state('app.editperiod', {
+  //   url: '/editperiod',
+  //   views: {
+  //     'menuContent': {
+  //       templateUrl: 'templates/editperiod.html',
+  //       controller: 'EditPeriodCtrl'
+  //     }
+  //   }
+  // })
   .state('app.profile', {
     url: '/profile',
     views: {

@@ -148,6 +148,7 @@ angular.module('starter.controllers', [])
 			sessionStorage.setItem('loggedin_name', $scope.user_details.name);
 			sessionStorage.setItem('loggedin_id', $scope.user_details.id );
       sessionStorage.setItem('loggedin_email', $scope.user_details.email);
+      sessionStorage.setItem('loggedin_created_at', $scope.user_details.created_at);
 				
 			// remove the instance of login page, when user moves to profile page.
 			// if you dont use it, you can get to login page, even if you are already logged in .
@@ -184,14 +185,13 @@ angular.module('starter.controllers', [])
   $scope.loggedin_name = sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id = sessionStorage.getItem('loggedin_id');
   $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
+  $scope.loggedin_created_at = sessionStorage.getItem('loggedin_created_at');
 })
 
 
-.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory) {
+.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory','$state', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory,$state) {
   // loads value from the loggedin session
-  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
   $scope.formSubmission = {};
   $scope.successToast = function(title, message){
     toaster.pop('success', title, message);
@@ -238,12 +238,11 @@ angular.module('starter.controllers', [])
       if (isValid) {
           $http.post($scope.url, {"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.startDate, "endDate": $scope.formSubmission.endDate, "description": $scope.formSubmission.description})
                   .success(function(data, status) {
-                      console.log($scope.formSubmission.description);
-                      console.log(data.result);
                       $scope.status = status;
-                      $scope.data = data;
-                      $scope.result = data.result; // Show result from server in our <pre></pre> element
+                      $scope.result = data.result;
+                      console.log($scope.result);
                       $scope.successToast('SUCCESS', 'Data entered successfully!');
+                      $state.go('app.welcome', {}, {location: "replace", reload: true});
                       // there will be a redirect from here...
                   }).error(function(error, status){
                       $scope.status = status;
@@ -259,36 +258,14 @@ angular.module('starter.controllers', [])
   }
 }])
       
-.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion) {  
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet) {  
   // loads value from the loggedin session
-  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
 
   $scope.showButtons = false;
   $scope.showButtonSettings = function() {
     return $scope.showButtons = !$scope.showButtons;
   }
-
-  // Create the register modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/editperiod.html', {
-    scope: $scope
-  }).then(function(modalEditPeriod) {
-    $scope.modalEditPeriod = modalEditPeriod;
-  });
-  // Triggered in the register modal to close it
-  $scope.closeEditPeriod = function() {
-    $scope.modalEditPeriod.hide();
-  };
-  // Open the register modal
-  $scope.editPeriod = function(period) {
-    $scope.modalEditPeriod.show();
-    $scope.period = period;
-    $timeout(function () {
-      ionicMaterialInk.displayEffect();
-      ionicMaterialMotion.ripple();
-    }, 300);
-  };
 
     if(!sessionStorage.getItem('loggedin_name')){   
       //if not logged in
@@ -311,6 +288,45 @@ angular.module('starter.controllers', [])
         });
       });
     }
+
+    // Create the edit modal that we will use later
+    $ionicModal.fromTemplateUrl('templates/editperiod.html', {
+      scope: $scope,
+      backdropClickToClose: false
+    }).then(function(modalEditPeriod) {
+      $scope.modalEditPeriod = modalEditPeriod;
+    });
+    // Triggered in the edit modal to close it
+    $scope.closeEditPeriod = function() {
+      $scope.modalEditPeriod.hide();
+    };
+    // Open the edit modal
+    $scope.editPeriod = function(period) {
+      $scope.modalEditPeriod.show();
+      $scope.formSubmission = period;
+      $timeout(function () {
+        ionicMaterialInk.displayEffect();
+        ionicMaterialMotion.ripple();
+      }, 300);
+    };
+
+    // open delete action sheet
+    $scope.showDltPrdActnsht = function(period) {
+      $ionicActionSheet.show({
+        titleText: 'Confirm Delete?',    
+        destructiveText: '<i class="icon ion-trash-a"></i> Delete',
+        cancelText: '<i class="icon ion-close"></i> Cancel',
+        cancel: function() {
+          console.log('Canceled!');
+        },
+        destructiveButtonClicked: function() {
+          console.log('Deleted!');
+          return true;
+        }
+      });
+    };
+
+
     $timeout(function () {
       ionicMaterialInk.displayEffect();
       //ionicMaterialMotion.ripple();
@@ -320,9 +336,7 @@ angular.module('starter.controllers', [])
 
 .controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state) {
   // loads value from the loggedin session
-  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
   $calendar = $('[ui-calendar]');
   var date = new Date(),
   d = date.getDate(),
@@ -355,7 +369,7 @@ angular.module('starter.controllers', [])
   };
   $scope.events = [];
 
-  $http.get("http://localhost/angular_server1/getPeriodList.php?id="+$scope.loggedin_id)
+  $http.get("http://localhost/angular_server1/getPeriodListForCalender.php?id="+$scope.loggedin_id)
   .then(function (data) {
     //console.log(data);
     $scope.events.slice(0, $scope.events.length);
@@ -374,9 +388,88 @@ angular.module('starter.controllers', [])
 
 }])
 
-.controller('ProfileCtrl', function($scope, $stateParams, ionicMaterialInk,ionicMaterialMotion) {
+.controller('EditPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory) {
+  // loads value from the loggedin session
+  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  //$scope.formSubmission = {};
+  $scope.successToast = function(title, message){
+    toaster.pop('success', title, message);
+  };
+  $scope.errorToast = function(title, message){
+    toaster.pop('error', title, message);
+  };
+  $timeout(function () {
+    ionicMaterialInk.displayEffect();
+    ionicMaterialMotion.ripple();
+  }, 300);
+  var ipObj3 = {
+    callback: function (val) {  //Mandatory
+      $scope.formSubmission.start = $filter('date')(val, "MMMM dd, yyyy"); 
+    },
+    inputDate: new Date(),      //Optional
+    sundayFirst: true,          //Optional
+    disableWeekdays: [],       //Optional
+    closeOnSelect: true,       //Optional
+    templateType: 'popup'       //Optional
+  };
+  $scope.openDatePicker3 = function(){
+    ionicDatePicker.openDatePicker(ipObj3);
+  };
+  var ipObj4 = {
+    callback: function (val) {  //Mandatory
+      $scope.formSubmission.end = $filter('date')(val, "MMMM dd, yyyy"); 
+    },
+    inputDate: new Date(),      //Optional
+    sundayFirst: true,          //Optional
+    disableWeekdays: [],       //Optional
+    closeOnSelect: true,       //Optional
+    templateType: 'popup'       //Optional
+  };
+  $scope.openDatePicker4 = function(){
+    ionicDatePicker.openDatePicker(ipObj4);
+  };
+  
+  $scope.url = 'http://localhost/angular_server1/updateperiod.php';
+  $scope.formsubmitUpdate = function(isValid) {
+      if (isValid) {
+          $http.post($scope.url, {"id":$scope.formSubmission.id,"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.start, "endDate": $scope.formSubmission.end, "description": $scope.formSubmission.title})
+                  .success(function(data, status) {
+                      console.log($scope.formSubmission.description);
+                      console.log(data.result);
+                      $scope.status = status;
+                      $scope.data = data;
+                      $scope.result = data.result; // Show result from server in our <pre></pre> element
+                      $scope.successToast('SUCCESS', 'Data updated successfully!');
+                      $scope.closeEditPeriod();
+                      // there will be a redirect from here...
+                  }).error(function(error, status){
+                      $scope.status = status;
+                      $scope.result = error;
+                      console.log($scope.formSubmission.description);
+                      console.log($scope.result);
+                      console.log($scope.status);
+                      $scope.errorToast('ERROR', 'Something is wrong! Try again.');
+                  });
+      }else{  
+            $scope.result = {"error":"Something is wrong! Try again."};
+      }
+  }
+}])
+
+.controller('ProfileCtrl', function($scope, $http, $stateParams, ionicMaterialInk,ionicMaterialMotion, $timeout) {
+  $timeout(function () {
+    ionicMaterialInk.displayEffect();
+    ionicMaterialMotion.ripple();
+    ionicMaterialMotion.fadeSlideInRight();
+  }, 300);
+  $scope.loggedin_name = sessionStorage.getItem('loggedin_name');
+  $scope.loggedin_id = sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
+  $scope.loggedin_created_at = sessionStorage.getItem('loggedin_created_at');
 
 })
+
+
 .controller('WelcomeCtrl', function($scope,$timeout,$rootScope,$ionicHistory,$state, ionicMaterialInk,ionicMaterialMotion) {
   $timeout(function () {
     ionicMaterialInk.displayEffect();
@@ -389,7 +482,9 @@ angular.module('starter.controllers', [])
   $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
   if($scope.loggedin_id == null) {
     $rootScope.showLoginReg = true;
+    $rootScope.showHomePageItems = false;
   } else {
     $rootScope.showLoginReg = false; 
+    $rootScope.showHomePageItems = true; 
   }
 });

@@ -14,7 +14,7 @@
           <button class="button button-icon button-clear ion-person-add" ng-click="register()" ng-show="showLoginReg"></button>
         </div>
       </ion-nav-buttons>
-      <button menu-close class="button button-fab button-fab-bottom-right button-assertive icon ion-waterdrop waves-effect waves-button waves-light" ui-sref="app.entryperiod"></button>
+      <button menu-close class="button button-fab button-fab-bottom-right button-assertive icon ion-waterdrop waves-effect waves-button waves-light" ui-sref="app.entryperiod" ng-show="!showLoginReg"></button>
     </ion-nav-bar>
     <ion-nav-view name="menuContent"></ion-nav-view>
   </ion-side-menu-content>

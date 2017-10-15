@@ -14,7 +14,7 @@
   <ion-content ng-class="{expanded:isExpanded}">
     <ion-list class="animate-fade-slide-in-right" show-delete="showButtons">
       <ion-item ng-repeat="period in periods"  class="item item-text-wrap  item-button-right">
-        <i class="icon ion-waterdrop assertive"></i> {{period.start | limitTo: 10 | date: "MMMM dd"}}-{{period.end | limitTo: 10 | date: "MMMM dd"}}
+        <i class="icon ion-waterdrop assertive"></i> {{ period.start | limitTo: 10 | date: "MMMM dd" }}-{{ period.end | limitTo: 10 | date: "MMMM dd"}}
           <ion-delete-button class="icon ion-trash-a delete-button ink" ng-click="showDltPrdActnsht(period)"></ion-delete-button>
           <ion-delete-button class="icon ion-compose edit-button ink" ng-click="editPeriod(period)"></ion-delete-button>
           <!-- <ion-option-button class="button-assertive"

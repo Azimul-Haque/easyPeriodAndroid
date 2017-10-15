@@ -11,9 +11,9 @@
 
             <div class="item item-body animate-fade-slide-in-right">
                 <p> <b>Joined:</b> {{ loggedin_created_at | limitTo: 10 | date: "MMMM dd, y" }}</p>
-                <p> <b>LMP Date:</b> November 05, 1955</p>
-                <p> <b>Last entry:</b> November 05, 1955</p>
-                <p> <b>Total entry:</b> 21</p>
+                <p> <b>LMP Date:</b> {{ periods[0].start | date: "MMMM dd, y" }}</p>
+                <p> <b>Last entry:</b> {{ periods[0].created_at | date: "MMMM dd, y" }}</p>
+                <p> <b>Total entry:</b> {{ periods.length }}</p>
             </div>
         </div>
     </ion-content>

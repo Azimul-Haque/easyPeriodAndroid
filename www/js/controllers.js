@@ -2,15 +2,6 @@ angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope,toaster,$timeout,ionicMaterialInk,ionicMaterialMotion,$ionicModal,$timeout,$http,$rootScope,$ionicPopup,$state,$ionicHistory,$ionicLoading) {
 
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-  // loads value from the loggedin session
-  // Form data for the login modal
-
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     ionicMaterialMotion.ripple();
@@ -82,7 +73,7 @@ angular.module('starter.controllers', [])
   // Perform the register action when the user submits the register form
   $scope.doRegister = function() {
     $ionicLoading.show({ template: '<center><div class="loader"></div><br/>Loading...</center>', noBackdrop: false, delay: 100 });
-    str="http://localhost/angular_server1/register.php?name="+$scope.newuser.name+"&email="+$scope.newuser.email+"&password="+$scope.newuser.password+"&passwordconf="+$scope.newuser.passwordconf;
+    str="http://orbachinujbuk.com/ionic_server/register.php?name="+$scope.newuser.name+"&email="+$scope.newuser.email+"&password="+$scope.newuser.password+"&passwordconf="+$scope.newuser.passwordconf;
     $http.get(str)
     .success(function(response){
       //console.log('Done Register', response);
@@ -139,10 +130,11 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     $ionicLoading.show({ template: '<center><div class="loader"></div><br/>Loading...</center>', noBackdrop: false, delay: 100 });
-    str="http://localhost/angular_server1/login.php?email="+$scope.user.email+"&password="+$scope.user.password;
+    str="http://orbachinujbuk.com/ionic_server/login.php?email="+$scope.user.email+"&password="+$scope.user.password;
     $http.get(str)
     .success(function (response){   // if login request is Accepted 
       // records is the 'server response array' variable name.
+      console.log(str);
       $scope.user_details = response.records;  // copy response values to user-details object.
       //stores the data in the session. if the user is logged in, then there is no need to show login again.
 			sessionStorage.setItem('loggedin_name', $scope.user_details.name);
@@ -233,7 +225,7 @@ angular.module('starter.controllers', [])
     ionicDatePicker.openDatePicker(ipObj2);
   };
   
-  $scope.url = 'http://localhost/angular_server1/entryperiod.php';
+  $scope.url = 'http://orbachinujbuk.com/ionic_server/entryperiod.php';
   $scope.formsubmit = function(isValid) {
       if (isValid) {
           $http.post($scope.url, {"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.startDate, "endDate": $scope.formSubmission.endDate, "description": $scope.formSubmission.description})
@@ -275,7 +267,7 @@ angular.module('starter.controllers', [])
         template: 'Please login first!'
       });
     } else {
-      $http.get("http://localhost/angular_server1/getPeriodList.php?id="+$scope.loggedin_id)
+      $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
       .then(function (response) {
         $scope.periods = response.data;
         console.log($scope.periods);
@@ -283,7 +275,7 @@ angular.module('starter.controllers', [])
       function(error) {
         $scope.error = error;
         var alertPopup = $ionicPopup.alert({
-          title: 'Test 2!',
+          title: 'Error',
           template: $scope.error
         });
       });
@@ -334,7 +326,7 @@ angular.module('starter.controllers', [])
     }, 300);
 })
 
-.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state) {
+.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state','$filter',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state,$filter) {
   // loads value from the loggedin session
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
   $calendar = $('[ui-calendar]');
@@ -357,7 +349,7 @@ angular.module('starter.controllers', [])
       },
       eventClick: function(date, jsEvent, view) {
         var alertPopup = $ionicPopup.alert({
-          title: date.start + '-' + date.end,
+          title: $filter('date')(new Date(date.start), "MMMM dd") + '-' + $filter('date')(new Date(date.end), "MMMM dd"),
           template: date.title
         });
       },
@@ -369,7 +361,7 @@ angular.module('starter.controllers', [])
   };
   $scope.events = [];
 
-  $http.get("http://localhost/angular_server1/getPeriodListForCalender.php?id="+$scope.loggedin_id)
+  $http.get("http://orbachinujbuk.com/ionic_server/getPeriodListForCalender.php?id="+$scope.loggedin_id)
   .then(function (data) {
     //console.log(data);
     $scope.events.slice(0, $scope.events.length);
@@ -429,7 +421,7 @@ angular.module('starter.controllers', [])
     ionicDatePicker.openDatePicker(ipObj4);
   };
   
-  $scope.url = 'http://localhost/angular_server1/updateperiod.php';
+  $scope.url = 'http://orbachinujbuk.com/ionic_server/updateperiod.php';
   $scope.formsubmitUpdate = function(isValid) {
       if (isValid) {
           $http.post($scope.url, {"id":$scope.formSubmission.id,"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.start, "endDate": $scope.formSubmission.end, "description": $scope.formSubmission.title})
@@ -466,7 +458,19 @@ angular.module('starter.controllers', [])
   $scope.loggedin_id = sessionStorage.getItem('loggedin_id');
   $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
   $scope.loggedin_created_at = sessionStorage.getItem('loggedin_created_at');
-
+ 
+  $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
+  .then(function (response) {
+    $scope.periods = response.data;
+    console.log($scope.periods);
+  },
+  function(error) {
+    $scope.error = error;
+    var alertPopup = $ionicPopup.alert({
+      title: 'Error',
+      template: $scope.error
+    });
+  });
 })
 
 

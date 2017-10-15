@@ -250,7 +250,12 @@ angular.module('starter.controllers', [])
   }
 }])
       
-.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet) {  
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet,$ionicHistory) {
+
+  $scope.$on('$ionicView.enter', function(){
+    $ionicHistory.clearCache();
+    $ionicHistory.clearHistory();
+  });
   // loads value from the loggedin session
   $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
 
@@ -267,6 +272,7 @@ angular.module('starter.controllers', [])
         template: 'Please login first!'
       });
     } else {
+      $ionicHistory.clearCache();
       $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
       .then(function (response) {
         $scope.periods = response.data;
@@ -280,6 +286,21 @@ angular.module('starter.controllers', [])
         });
       });
     }
+
+    // refresh it
+    $scope.doRefresh = function() {
+      console.log('Refreshing!');
+      $scope.$on('$ionicView.enter', function() {
+        $ionicHistory.clearCache();
+      });
+      $timeout( function() {
+        $ionicHistory.clearCache([$state.current.name]).then(function() {
+          $state.reload();
+        });
+        $scope.$broadcast('scroll.refreshComplete');
+      }, 1000);
+    };
+    // refresh it
 
     // Create the edit modal that we will use later
     $ionicModal.fromTemplateUrl('templates/editperiod.html', {

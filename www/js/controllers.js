@@ -2,6 +2,7 @@ angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope,toaster,$timeout,ionicMaterialInk,ionicMaterialMotion,$ionicModal,$timeout,$http,$rootScope,$ionicPopup,$state,$ionicHistory,$ionicLoading) {
 
+  $scope.loggedin_name = "";
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     ionicMaterialMotion.ripple();
@@ -14,7 +15,7 @@ angular.module('starter.controllers', [])
     toaster.pop('success', title, message);
     // toaster.pop('error', title, message);
     // toaster.pop('warning', title, message);
-    //toaster.pop('note', title, message);
+    // toaster.pop('note', title, message);
   };
 
   // Create the register modal that we will use later
@@ -53,9 +54,10 @@ angular.module('starter.controllers', [])
   //logout function
   $scope.logout= function(){
     //delete all the sessions 
-    delete sessionStorage.loggedin_name;
-    delete sessionStorage.loggedin_id;
-    delete sessionStorage.loggedin_email;				
+    delete localStorage.loggedin_name;
+    delete localStorage.loggedin_id;
+    delete localStorage.loggedin_email;				
+    delete localStorage.loggedin_created_at;				
     // remove the profile page backlink after logout.
     $ionicHistory.nextViewOptions({
       disableAnimate: true,
@@ -137,10 +139,10 @@ angular.module('starter.controllers', [])
       console.log(str);
       $scope.user_details = response.records;  // copy response values to user-details object.
       //stores the data in the session. if the user is logged in, then there is no need to show login again.
-			sessionStorage.setItem('loggedin_name', $scope.user_details.name);
-			sessionStorage.setItem('loggedin_id', $scope.user_details.id );
-      sessionStorage.setItem('loggedin_email', $scope.user_details.email);
-      sessionStorage.setItem('loggedin_created_at', $scope.user_details.created_at);
+			localStorage.setItem('loggedin_name', $scope.user_details.name);
+			localStorage.setItem('loggedin_id', $scope.user_details.id );
+      localStorage.setItem('loggedin_email', $scope.user_details.email);
+      localStorage.setItem('loggedin_created_at', $scope.user_details.created_at);
 				
 			// remove the instance of login page, when user moves to profile page.
 			// if you dont use it, you can get to login page, even if you are already logged in .
@@ -172,25 +174,39 @@ angular.module('starter.controllers', [])
         });
       }
     });
+    $scope.loggedin_name = localStorage.getItem('loggedin_name');
+
+    $timeout(function () {
+      $scope.loggedin_name = localStorage.getItem('loggedin_name');
+      $scope.loggedin_id = localStorage.getItem('loggedin_id');
+      $scope.loggedin_email = localStorage.getItem('loggedin_email');
+      $scope.loggedin_created_at = localStorage.getItem('loggedin_created_at');
+    }, 2000);
   };
 
-  $scope.loggedin_name = sessionStorage.getItem('loggedin_name');
-  $scope.loggedin_id = sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
-  $scope.loggedin_created_at = sessionStorage.getItem('loggedin_created_at');
+  $scope.loggedin_name = localStorage.getItem('loggedin_name');
+  $scope.loggedin_id = localStorage.getItem('loggedin_id');
+  $scope.loggedin_email = localStorage.getItem('loggedin_email');
+  $scope.loggedin_created_at = localStorage.getItem('loggedin_created_at');
+
+  // for the notification
+  
+  
 })
 
 
-.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory','$state', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory,$state) {
+.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory','$state', '$cordovaLocalNotification', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory,$state,$cordovaLocalNotification) {
   // loads value from the loggedin session
-  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_id= localStorage.getItem('loggedin_id');
   $scope.formSubmission = {};
   $scope.successToast = function(title, message){
     toaster.pop('success', title, message);
     // toaster.pop('error', title, message);
-    // toaster.pop('warning', title, message);
-    //toaster.pop('note', title, message);
+    // toaster.pop('note', title, message);
   };
+  $scope.warningToast = function(title, message) {
+    toaster.pop('warning', title, message);
+  }
   $scope.errorToast = function(title, message){
     toaster.pop('error', title, message);
   };
@@ -233,9 +249,19 @@ angular.module('starter.controllers', [])
                       $scope.status = status;
                       $scope.result = data.result;
                       console.log($scope.result);
-                      $scope.successToast('SUCCESS', 'Data entered successfully!');
+                      //$scope.addNotification(); // local push notification
+                      if($scope.result.created == 1) {
+                        $scope.successToast('SUCCESS', 'Data entered successfully!');
+                      } else {
+                        $scope.warningToast('WARNING', 'Already exists! Try another.');
+                      }
+                      $scope.nmpDateRaw = $scope.formSubmission.startDate;;
+                      $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
+                      console.log($filter('date')($scope.nmpDate, "MMMM dd"));
+                      $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
+                      $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
                       $state.go('app.welcome', {}, {location: "replace", reload: true});
-                      // there will be a redirect from here...
+                      
                   }).error(function(error, status){
                       $scope.status = status;
                       $scope.result = error;
@@ -248,23 +274,61 @@ angular.module('starter.controllers', [])
             $scope.result = {"error":"Something is wrong! Try again."};
       }
   }
+  // UNCOMMENT AFTER THIS COMMENT>>>>>>>>>>>>>>>
+  $scope.nmpDateRaw_ntfctn = $scope.formSubmission.startDate;
+  $scope.nmpDate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 28);
+  $scope.nfsdate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 9);
+  $scope.nfedate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 15);
+
+  $scope.nmpDate_ntfctn = $filter('date')($scope.nmpDate_ntfctn, "MMMM dd");
+  $scope.nfsdate_ntfctn = $filter('date')($scope.nfsdate_ntfctn, "MMMM dd");
+  $scope.nfedate_ntfctn = $filter('date')($scope.nfedate_ntfctn, "MMMM dd");
+  $scope.addNotification = function() {
+    // further works need to be done...
+    var alarmTime = new Date();
+    alarmTime.setMinutes(alarmTime.getMinutes() + 1);
+    $cordovaLocalNotification.add({
+        id: "1234",
+        date: alarmTime,
+        message: "Next probable period: "+$scope.nmpDate_ntfctn+". Safe zone: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn,
+        title: "EasyPeriod:",
+        autoCancel: true,
+        sound: null
+    }).then(function () {
+        //console.log("The notification has been set");
+    });
+  };
+  // if($scope.isScheduled() != true ) {
+    
+  // }
+  // $scope.isScheduled = function() {
+  //     $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
+  //         return true;
+  //     });
+  // }
 }])
       
-.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet,$ionicHistory) {
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet,$ionicHistory,toaster) {
 
   $scope.$on('$ionicView.enter', function(){
     $ionicHistory.clearCache();
     $ionicHistory.clearHistory();
   });
   // loads value from the loggedin session
-  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.successToast = function(title, message){
+    toaster.pop('success', title, message);
+  };
+  $scope.errorToast = function(title, message){
+    toaster.pop('error', title, message);
+  };
+  $scope.loggedin_id= localStorage.getItem('loggedin_id');
 
   $scope.showButtons = false;
   $scope.showButtonSettings = function() {
     return $scope.showButtons = !$scope.showButtons;
   }
 
-    if(!sessionStorage.getItem('loggedin_name')){   
+    if(!localStorage.getItem('loggedin_name')){   
       //if not logged in
       $state.go('app.welcome', {}, {location: "replace", reload: true});
       var alertPopup = $ionicPopup.alert({
@@ -272,7 +336,7 @@ angular.module('starter.controllers', [])
         template: 'Please login first!'
       });
     } else {
-      $ionicHistory.clearCache();
+      //$ionicHistory.clearCache();
       $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
       .then(function (response) {
         $scope.periods = response.data;
@@ -292,6 +356,7 @@ angular.module('starter.controllers', [])
       console.log('Refreshing!');
       $scope.$on('$ionicView.enter', function() {
         $ionicHistory.clearCache();
+        $ionicHistory.clearHistory();
       });
       $timeout( function() {
         $ionicHistory.clearCache([$state.current.name]).then(function() {
@@ -312,6 +377,7 @@ angular.module('starter.controllers', [])
     // Triggered in the edit modal to close it
     $scope.closeEditPeriod = function() {
       $scope.modalEditPeriod.hide();
+      $state.go('app.welcome', {}, {location: "replace", reload: true});
     };
     // Open the edit modal
     $scope.editPeriod = function(period) {
@@ -333,23 +399,42 @@ angular.module('starter.controllers', [])
           console.log('Canceled!');
         },
         destructiveButtonClicked: function() {
-          console.log('Deleted!');
+          //console.log('Deleted!');
+          $scope.periodToDelete = period;
+          console.log($scope.periodToDelete);
+          $http.get("http://orbachinujbuk.com/ionic_server/deleteperiod.php?user_id="+$scope.loggedin_id+"&id="+$scope.periodToDelete.id)
+          .then(function (response) {
+            $scope.deleted = response.data.result;
+            console.log($scope.deleted);
+            if($scope.deleted.deleted == 1) {
+              $scope.successToast('SUCCESS', 'Data deleted successfully!');
+            } else {
+              $scope.errorToast('ERROR', 'Data could not be deleted!');
+            }
+            $state.go('app.welcome', {}, {location: "replace", reload: true});
+          },
+          function(error) {
+            $scope.error = error;
+            var alertPopup = $ionicPopup.alert({
+              title: 'Error',
+              template: $scope.error
+            });
+          });
           return true;
         }
       });
     };
 
-
     $timeout(function () {
-      ionicMaterialInk.displayEffect();
-      //ionicMaterialMotion.ripple();
-      ionicMaterialMotion.fadeSlideInRight();
+      // ionicMaterialInk.displayEffect();
+      // ionicMaterialMotion.ripple();
+      // ionicMaterialMotion.fadeSlideInRight();
     }, 300);
 })
 
 .controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state','$filter',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state,$filter) {
   // loads value from the loggedin session
-  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_id= localStorage.getItem('loggedin_id');
   $calendar = $('[ui-calendar]');
   var date = new Date(),
   d = date.getDate(),
@@ -392,7 +477,8 @@ angular.module('starter.controllers', [])
         start: new Date(value.start),
         end: new Date(value.end),
         allDay: false,
-        stick: true
+        stick: true,
+        className: 'Rifat' // fertility color will be changed
       });
     });
   });
@@ -403,11 +489,14 @@ angular.module('starter.controllers', [])
 
 .controller('EditPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory) {
   // loads value from the loggedin session
-  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
+  $scope.loggedin_id= localStorage.getItem('loggedin_id');
   //$scope.formSubmission = {};
   $scope.successToast = function(title, message){
     toaster.pop('success', title, message);
   };
+  $scope.warningToast = function(title, message) {
+    toaster.pop('warning', title, message);
+  }
   $scope.errorToast = function(title, message){
     toaster.pop('error', title, message);
   };
@@ -452,9 +541,15 @@ angular.module('starter.controllers', [])
                       $scope.status = status;
                       $scope.data = data;
                       $scope.result = data.result; // Show result from server in our <pre></pre> element
-                      $scope.successToast('SUCCESS', 'Data updated successfully!');
+                      if($scope.result.updated == 1) {
+                        $scope.successToast('SUCCESS', 'Data updated successfully!');
+                      } else {
+                        $scope.warningToast('WARNING', 'Already exists! Try again.');
+                      }
+                      //$state.go('app.welcome', {}, {location: "replace", reload: true});
                       $scope.closeEditPeriod();
                       // there will be a redirect from here...
+                      
                   }).error(function(error, status){
                       $scope.status = status;
                       $scope.result = error;
@@ -475,10 +570,10 @@ angular.module('starter.controllers', [])
     ionicMaterialMotion.ripple();
     ionicMaterialMotion.fadeSlideInRight();
   }, 300);
-  $scope.loggedin_name = sessionStorage.getItem('loggedin_name');
-  $scope.loggedin_id = sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email = sessionStorage.getItem('loggedin_email');
-  $scope.loggedin_created_at = sessionStorage.getItem('loggedin_created_at');
+  $scope.loggedin_name = localStorage.getItem('loggedin_name');
+  $scope.loggedin_id = localStorage.getItem('loggedin_id');
+  $scope.loggedin_email = localStorage.getItem('loggedin_email');
+  $scope.loggedin_created_at = localStorage.getItem('loggedin_created_at');
  
   $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
   .then(function (response) {
@@ -495,16 +590,20 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('WelcomeCtrl', function($scope,$timeout,$rootScope,$ionicHistory,$state, ionicMaterialInk,ionicMaterialMotion) {
+.controller('WelcomeCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state, ionicMaterialInk,ionicMaterialMotion,$filter) {
+  $scope.$on('$ionicView.enter', function(){
+    $ionicHistory.clearCache();
+    $ionicHistory.clearHistory();
+  });
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     //ionicMaterialMotion.ripple();
     //ionicMaterialMotion.fadeSlideInRight();
   }, 300); 
   // loads value from the loggedin session
-  $scope.loggedin_name= sessionStorage.getItem('loggedin_name');
-  $scope.loggedin_id= sessionStorage.getItem('loggedin_id');
-  $scope.loggedin_email= sessionStorage.getItem('loggedin_email');
+  $scope.loggedin_name= localStorage.getItem('loggedin_name');
+  $scope.loggedin_id= localStorage.getItem('loggedin_id');
+  $scope.loggedin_email= localStorage.getItem('loggedin_email');
   if($scope.loggedin_id == null) {
     $rootScope.showLoginReg = true;
     $rootScope.showHomePageItems = false;
@@ -512,4 +611,23 @@ angular.module('starter.controllers', [])
     $rootScope.showLoginReg = false; 
     $rootScope.showHomePageItems = true; 
   }
+
+  // for the notification
+  $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
+  .then(function (response) {
+    $scope.periods = response.data;
+    console.log($scope.periods);
+    $scope.nmpDateRaw = $scope.periods[0].start;
+    $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
+    console.log($filter('date')($scope.nmpDate, "MMMM dd"));
+    $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
+    $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
+  },
+  function(error) {
+    $scope.error = error;
+    var alertPopup = $ionicPopup.alert({
+      title: 'Error',
+      template: $scope.error
+    });
+  });
 });

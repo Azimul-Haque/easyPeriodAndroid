@@ -1,1 +1,1 @@
-{"plugins":["cordova-plugin-device","cordova-plugin-splashscreen","cordova-plugin-statusbar","cordova-plugin-whitelist","ionic-plugin-keyboard","cordova-plugin-network-information","cordova-plugin-x-toast"]}
+{"plugins":["cordova-plugin-device","cordova-plugin-splashscreen","cordova-plugin-statusbar","cordova-plugin-whitelist","ionic-plugin-keyboard","cordova-plugin-network-information","cordova-plugin-x-toast","onesignal-cordova-plugin","de.appplant.cordova.plugin.local-notification","cordova-plugin-app-event"]}

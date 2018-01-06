@@ -32,14 +32,14 @@
         </label>
         <label class="item item-input item-floating-label">
           <span class="input-label">Retype Password</span>
-          <input type="password" placeholder="Retype Password" ng-model="newuser.passwordconf" name="passwordconf" equal="newuser.password" required>
+          <input type="password" placeholder="Retype Password" ng-model="newuser.passwordconf" name="passwordconf" ng-pattern="\b{{newuser.password}}\b" required>
           <span style="color:red" ng-show="registerForm.passwordconf.$touched && registerForm.passwordconf.$invalid">
             <span ng-show="registerForm.passwordconf.$error.required" style="font-size:12px;">Password confirm is required.</span>
-            <span ng-show="registerForm.passwordconf.$error.equal" style="font-size:12px;">Password does not match.</span>
+            <span ng-show="registerForm.passwordconf.$error" style="font-size:12px;">Password does not match.</span>
           </span>
         </label>
         <label class="item">
-          <button class="button button-block button-positive ink" type="submit">Log in</button>
+          <button class="button button-block button-positive ink" >Register</button>
         </label>
       </div>
     </form>

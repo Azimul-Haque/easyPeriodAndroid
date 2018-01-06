@@ -10,14 +10,17 @@
     },
     "dependencies": {
         "cordova-android": "^6.2.3",
+        "cordova-plugin-app-event": "file:node_modules\\cordova-plugin-app-event",
         "cordova-plugin-device": "^1.1.4",
         "cordova-plugin-network-information": "^1.3.3",
         "cordova-plugin-splashscreen": "^4.0.3",
         "cordova-plugin-statusbar": "^2.2.1",
         "cordova-plugin-whitelist": "^1.3.1",
         "cordova-plugin-x-toast": "git+https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git",
+        "de.appplant.cordova.plugin.local-notification": "^0.8.5",
         "ionic-plugin-keyboard": "^2.2.1",
-        "ionic-toast": "^0.4.1"
+        "ionic-toast": "^0.4.1",
+        "onesignal-cordova-plugin": "^2.2.5"
     },
     "cordova": {
         "plugins": {
@@ -26,7 +29,8 @@
             "cordova-plugin-statusbar": {},
             "cordova-plugin-whitelist": {},
             "ionic-plugin-keyboard": {},
-            "cordova-plugin-network-information": {}
+            "cordova-plugin-network-information": {},
+            "de.appplant.cordova.plugin.local-notification": {}
         },
         "platforms": [
             "android"

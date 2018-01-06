@@ -1,5 +1,15 @@
 <ion-view view-title="Easy Period" cache-view="false">
   <ion-content class="">
+    <div class="list" ng-show="showHomePageItems">
+        <a class="item item-icon-left" href="#">
+          <i class="icon ion-waterdrop assertive"></i>
+          Probable next period: <b>{{ nmpDate | date: "MMMM dd" }}</b>
+        </a>
+        <a class="item item-icon-left" href="#">
+          <i class="icon ion-heart calm"></i>
+          Fertility: <b>{{ nfsdate | date: "MMM dd" }}-{{ nfedate | date: "MMM dd" }}</b>
+        </a>
+    </div>
     <div class="row" ng-show="showHomePageItems">
         <a menu-close class="col col-50" ui-sref="app.entryperiod">
           <div class="card text-center periodEntryCard ink">

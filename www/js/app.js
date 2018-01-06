@@ -4,7 +4,7 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'starter.controllers','toaster', 'ionic-datepicker', 'ionic-material', 'ui.calendar'])
+angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers','toaster', 'ionic-datepicker', 'ionic-material', 'ui.calendar'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -18,6 +18,16 @@ angular.module('starter', ['ionic', 'starter.controllers','toaster', 'ionic-date
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    // window.plugin.notification.local.onadd = function (id, state, json) {
+    //   var notification = {
+    //       id: id,
+    //       state: state,
+    //       json: json
+    //   };
+    //   $timeout(function() {
+    //       $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
+    //   });
+    // };
   });
 })
 
@@ -43,6 +53,7 @@ angular.module('starter', ['ionic', 'starter.controllers','toaster', 'ionic-date
   })
   .state('app.entryperiod', {
     url: '/entryperiod',
+    cache: false,
     views: {
       'menuContent': {
         templateUrl: 'templates/entryperiod.html',

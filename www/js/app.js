@@ -99,6 +99,15 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers','toaster'
       }
     }
   })
+  .state('app.about', {
+    url: '/about',
+    views: {
+      'menuContent': {
+        templateUrl: 'templates/about.html',
+        controller: 'AboutCtrl'
+      }
+    }
+  })
   $urlRouterProvider.otherwise('/app/welcome');
 
   var datePickerObj = {

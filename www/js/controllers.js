@@ -249,7 +249,9 @@ angular.module('starter.controllers', [])
                       $scope.status = status;
                       $scope.result = data.result;
                       console.log($scope.result);
-                      //$scope.addNotification(); // local push notification
+                      //$scope.cancelNotifications(); // local push notification
+                      $scope.addNotification1(); // local push notification
+                      $scope.addNotification2(); // local push notification
                       if($scope.result.created == 1) {
                         $scope.successToast('SUCCESS', 'Data entered successfully!');
                       } else {
@@ -257,7 +259,7 @@ angular.module('starter.controllers', [])
                       }
                       $scope.nmpDateRaw = $scope.formSubmission.startDate;;
                       $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
-                      console.log($filter('date')($scope.nmpDate, "MMMM dd"));
+                      console.log('Next Probable Period: ' + $filter('date')($scope.nmpDate, "MMMM dd"));
                       $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
                       $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
                       $state.go('app.welcome', {}, {location: "replace", reload: true});
@@ -273,39 +275,73 @@ angular.module('starter.controllers', [])
       }else{  
             $scope.result = {"error":"Something is wrong! Try again."};
       }
-  }
-  // UNCOMMENT AFTER THIS COMMENT>>>>>>>>>>>>>>>
-  $scope.nmpDateRaw_ntfctn = $scope.formSubmission.startDate;
-  $scope.nmpDate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 28);
-  $scope.nfsdate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 9);
-  $scope.nfedate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 15);
+    // UNCOMMENT AFTER THIS COMMENT>>>>>>>>>>>>>>>
+    $scope.nmpDateRaw_ntfctn = $scope.formSubmission.startDate;
+    console.log($scope.formSubmission.startDate);
+    $scope.nmpDate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 28);
+    $scope.nfsdate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 9);
+    $scope.nfedate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 15);
 
-  $scope.nmpDate_ntfctn = $filter('date')($scope.nmpDate_ntfctn, "MMMM dd");
-  $scope.nfsdate_ntfctn = $filter('date')($scope.nfsdate_ntfctn, "MMMM dd");
-  $scope.nfedate_ntfctn = $filter('date')($scope.nfedate_ntfctn, "MMMM dd");
-  $scope.addNotification = function() {
-    // further works need to be done...
-    var alarmTime = new Date();
-    alarmTime.setMinutes(alarmTime.getMinutes() + 1);
-    $cordovaLocalNotification.add({
-        id: "1234",
-        date: alarmTime,
-        message: "Next probable period: "+$scope.nmpDate_ntfctn+". Safe zone: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn,
-        title: "EasyPeriod:",
-        autoCancel: true,
-        sound: null
-    }).then(function () {
-        //console.log("The notification has been set");
-    });
-  };
-  // if($scope.isScheduled() != true ) {
-    
-  // }
-  // $scope.isScheduled = function() {
-  //     $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
-  //         return true;
-  //     });
-  // }
+    $scope.nmpDate_ntfctn = $filter('date')($scope.nmpDate_ntfctn, "MMMM dd");
+    $scope.nfsdate_ntfctn = $filter('date')($scope.nfsdate_ntfctn, "MMMM dd");
+    $scope.nfedate_ntfctn = $filter('date')($scope.nfedate_ntfctn, "MMMM dd");
+    console.log("Next probable period: "+$scope.nmpDate_ntfctn+". Ferlity: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn);
+    $scope.addNotification1 = function() {
+      // further works need to be done...
+      var alarmTime = new Date();
+      alarmTime.setDate(alarmTime.getDate()+1);
+      alarmTime.setHours(0);
+      alarmTime.setMinutes(0);
+      alarmTime.setSeconds(0);
+      //alarmTime.setMinutes(alarmTime.getMinutes() + 0);
+      $cordovaLocalNotification.add({
+          id: "12341",
+          message: "Next probable period: "+$scope.nmpDate_ntfctn,
+          title: "EasyPeriod",
+          autoCancel: true,
+          sound: null,
+          firstAt: alarmTime,
+          every: 'day',
+      }).then(function () {
+          //console.log("The notification has been set");
+      });
+    };
+    $scope.addNotification2 = function() {
+      // further works need to be done...
+      var alarmTime = new Date();
+      alarmTime.setDate(alarmTime.getDate()+1);
+      alarmTime.setHours(0);
+      alarmTime.setMinutes(0);
+      alarmTime.setSeconds(0);
+      //alarmTime.setMinutes(alarmTime.getMinutes() + 0);
+      $cordovaLocalNotification.add({
+          id: "12342",
+          message: "Fertility: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn,
+          title: "EasyPeriod",
+          autoCancel: true,
+          sound: null,
+          firstAt: alarmTime,
+          every: 'day'
+      }).then(function () {
+          //console.log("The notification has been set");
+      });
+    };
+
+    // $scope.cancelNotifications = function () {
+    //   $cordovaLocalNotification.cancel([12341, 12342]).then(function (result) {
+    //     //console.log('Notification 3 Canceled');
+    //   });
+    // };   
+
+    // if($scope.isScheduled() != true ) {
+      
+    // }
+    // $scope.isScheduled = function() {
+    //     $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
+    //         return true;
+    //     });
+    // }
+  }
 }])
       
 .controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet,$ionicHistory,toaster) {
@@ -587,6 +623,14 @@ angular.module('starter.controllers', [])
       template: $scope.error
     });
   });
+})
+.controller('AboutCtrl', function($scope, $http, $stateParams, ionicMaterialInk,ionicMaterialMotion, $timeout) {
+  $timeout(function () {
+    ionicMaterialInk.displayEffect();
+    ionicMaterialMotion.ripple();
+    ionicMaterialMotion.fadeSlideInRight();
+  }, 300);
+  
 })
 
 

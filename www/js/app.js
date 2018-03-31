@@ -4,9 +4,11 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers','toaster', 'ionic-datepicker', 'ionic-material', 'ui.calendar'])
+var database = "easyperiod.db";
+var db = null;
+var easyperiod = angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers','toaster', 'ionic-datepicker', 'ionic-material', 'ui.calendar']);
 
-.run(function($ionicPlatform) {
+easyperiod.run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -14,6 +16,11 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers','toaster'
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
     }
+    if(window.cordova) {
+      // enable the autostart for local notifications
+      cordova.plugins.autoStart.enable();
+    }
+    
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
@@ -28,6 +35,9 @@ angular.module('starter', ['ionic', 'ngCordova', 'starter.controllers','toaster'
     //       $rootScope.$broadcast("$cordovaLocalNotification:added", notification);
     //   });
     // };
+    db = window.openDatabase(database, '1.0', 'sqlitedemo', 2000);
+    $cordovaSQLite.execute(db, "CREATE TABLE periods(id integer primary key, user_id integer, start text unique, end text, description text, uniquekey text unique, created_at text, updated_at text)");
+      
   });
 })
 

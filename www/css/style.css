@@ -126,6 +126,15 @@ a{
     top:50px;
   }
 
+  .fertility,
+  .fertility div,
+  .fertility span {
+    background-color: #15C0F2; /* background color */
+    border-color: #15C0F2;     /* border color */
+    color: rgb(10, 8, 8); /* text color */
+    font-weight: bold;
+  }
+
 /* 
     Action Sheet Css
 */  

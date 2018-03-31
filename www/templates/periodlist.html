@@ -12,8 +12,7 @@
     <button menu-close class="button button-fab button-fab-bottom-right button-assertive icon ion-waterdrop waves-effect waves-button waves-light" ui-sref="app.entryperiod"></button>
   </ion-nav-bar>
   <ion-content>
-      <ion-refresher on-refresh="doRefresh()">    
-      </ion-refresher>
+    <ion-refresher on-refresh="doRefreshPL()"></ion-refresher>
     <ion-list show-delete="showButtons">
         <ion-item ng-repeat="period in periods"  class="item item-text-wrap  item-button-right">
           <i class="icon ion-waterdrop assertive"></i> {{ period.start | limitTo: 10 | date: "MMMM dd" }}-{{ period.end | limitTo: 10 | date: "MMMM dd"}}

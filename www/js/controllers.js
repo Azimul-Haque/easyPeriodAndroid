@@ -195,7 +195,7 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory','$state', '$cordovaLocalNotification', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory,$state,$cordovaLocalNotification) {
+.controller('EntryPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory','$state', '$cordovaLocalNotification', '$ionicLoading', '$cordovaSQLite','$ionicPopup', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory,$state,$cordovaLocalNotification, $ionicLoading, $cordovaSQLite, $ionicPopup) {
   // loads value from the loggedin session
   $scope.loggedin_id= localStorage.getItem('loggedin_id');
   $scope.formSubmission = {};
@@ -244,38 +244,63 @@ angular.module('starter.controllers', [])
   $scope.url = 'http://orbachinujbuk.com/ionic_server/entryperiod.php';
   $scope.formsubmit = function(isValid) {
       if (isValid) {
-          $http.post($scope.url, {"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.startDate, "endDate": $scope.formSubmission.endDate, "description": $scope.formSubmission.description})
-                  .success(function(data, status) {
-                      $scope.status = status;
-                      $scope.result = data.result;
-                      console.log($scope.result);
-                      //$scope.cancelNotifications(); // local push notification
-                      $scope.addNotification1(); // local push notification
-                      $scope.addNotification2(); // local push notification
-                      if($scope.result.created == 1) {
-                        $scope.successToast('SUCCESS', 'Data entered successfully!');
-                      } else {
-                        $scope.warningToast('WARNING', 'Already exists! Try another.');
-                      }
-                      $scope.nmpDateRaw = $scope.formSubmission.startDate;;
-                      $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
-                      console.log('Next Probable Period: ' + $filter('date')($scope.nmpDate, "MMMM dd"));
-                      $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
-                      $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
-                      $state.go('app.welcome', {}, {location: "replace", reload: true});
-                      
-                  }).error(function(error, status){
-                      $scope.status = status;
-                      $scope.result = error;
-                      console.log($scope.formSubmission.description);
-                      console.log($scope.result);
-                      console.log($scope.status);
-                      $scope.errorToast('ERROR', 'Something is wrong! Try again.');
-                  });
-      }else{  
-            $scope.result = {"error":"Something is wrong! Try again."};
+        // get the unique key
+        var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'.split('');
+        var uniquestr = '';
+        for (var i = 0; i < 10; i++) {
+            uniquestr += chars[Math.floor(Math.random() * chars.length)];
+        }
+        $scope.uniquekey = uniquestr;
+        $ionicLoading.show({ template: '<center><div class="loader"></div><br/>তথ্য জমা হচ্ছে...</center>', noBackdrop: false, delay: 100 });
+        // post the data on server first
+        $http.post($scope.url, {"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.startDate, "endDate": $scope.formSubmission.endDate, "description": $scope.formSubmission.description, "uniquekey": $scope.uniquekey})
+          .success(function(data, status) {
+              $scope.result = data.result;
+              console.log($scope.result);
+
+              // NOW post the data on local db, local notification too
+              if($scope.result.created == 1) {
+                console.log('Doing entry period', $scope.formSubmission);
+                $scope.today = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss");
+                $scope.start = $filter('date')(new Date($scope.formSubmission.startDate), "yyyy-MM-dd HH:mm:ss");
+                if($scope.formSubmission.endDate == undefined) { $scope.formSubmission.endDate = "January 01, 1970"; }
+                if($scope.formSubmission.description == undefined) { $scope.formSubmission.description = ""; }
+                $scope.end = $filter('date')(new Date($scope.formSubmission.endDate), "yyyy-MM-dd") + " 23:59:00";
+                console.log($scope.uniquekey);
+
+                var query = "INSERT INTO periods(user_id, start, end, description, uniquekey, created_at, updated_at) VALUES (?,?,?,?,?,?,?)";
+                $cordovaSQLite.execute(db, query, [$scope.loggedin_id, $scope.start, $scope.end, $scope.formSubmission.description, $scope.uniquekey, $scope.today, $scope.today]);
+                console.log("Done...");
+                $scope.successToast('SUCCESS', 'Data entered successfully!');
+                $state.go('app.welcome', {}, {location: "replace", reload: true});
+
+                //$scope.cancelNotifications(); // local push notification
+                $scope.addNotification1(); // local push notification
+                $scope.addNotification2(); // local push notification
+
+              } else {
+                $scope.warningToast('WARNING', 'Already exists! Try another.');
+              }
+              $ionicLoading.hide();             
+          }).error(function(error, status) {
+            $scope.status = status;
+            if(status <= 0) {
+              var alertPopup = $ionicPopup.alert({
+                title: 'Connection failed!',
+                template: 'Please check your internet connection!'
+              });
+            } else {
+              $scope.errorToast('ERROR', 'Something is wrong! Try again.');
+            }
+            $ionicLoading.hide();
+          });
+          
+      }else{
+        $state.go('app.welcome', {}, {location: "replace", reload: true});
+        $scope.result = {"error":"Something is wrong! Try again."};
       }
     // UNCOMMENT AFTER THIS COMMENT>>>>>>>>>>>>>>>
+
     $scope.nmpDateRaw_ntfctn = $scope.formSubmission.startDate;
     console.log($scope.formSubmission.startDate);
     $scope.nmpDate_ntfctn = new Date($scope.nmpDateRaw_ntfctn).setDate(new Date($scope.nmpDateRaw_ntfctn).getDate() + 28);
@@ -287,7 +312,6 @@ angular.module('starter.controllers', [])
     $scope.nfedate_ntfctn = $filter('date')($scope.nfedate_ntfctn, "MMMM dd");
     console.log("Next probable period: "+$scope.nmpDate_ntfctn+". Ferlity: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn);
     $scope.addNotification1 = function() {
-      // further works need to be done...
       var alarmTime = new Date();
       alarmTime.setDate(alarmTime.getDate()+1);
       alarmTime.setHours(0);
@@ -302,7 +326,7 @@ angular.module('starter.controllers', [])
           sound: null,
           firstAt: alarmTime,
           every: 'day',
-      }).then(function () {
+        }).then(function () {
           //console.log("The notification has been set");
       });
     };
@@ -316,7 +340,7 @@ angular.module('starter.controllers', [])
       //alarmTime.setMinutes(alarmTime.getMinutes() + 0);
       $cordovaLocalNotification.add({
           id: "12342",
-          message: "Fertility: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn,
+          message: "Fertility phase: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn,
           title: "EasyPeriod",
           autoCancel: true,
           sound: null,
@@ -326,26 +350,30 @@ angular.module('starter.controllers', [])
           //console.log("The notification has been set");
       });
     };
+    
 
     // $scope.cancelNotifications = function () {
-    //   $cordovaLocalNotification.cancel([12341, 12342]).then(function (result) {
-    //     //console.log('Notification 3 Canceled');
-    //   });
+    //   if($scope.isScheduled() == true ) {
+    //     $cordovaLocalNotification.cancelAll().then(function (result) {
+    //       //console.log('Notification 3 Canceled');
+    //     });
+    //   }
     // };   
 
-    // if($scope.isScheduled() != true ) {
-      
-    // }
+    // // do not uncomment these...
+    // // do not uncomment these...
+    
     // $scope.isScheduled = function() {
-    //     $cordovaLocalNotification.isScheduled("1234").then(function(isScheduled) {
+    //     $cordovaLocalNotification.isScheduled("12341").then(function(isScheduled) {
     //         return true;
     //     });
     // }
+    
   }
 }])
       
-.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet,$ionicHistory,toaster) {
-
+.controller('PeriodListCtrl', function($scope,$http,$timeout,$rootScope,$ionicModal,$state,$ionicPopup,ionicMaterialInk,ionicMaterialMotion, $ionicActionSheet,$ionicHistory,toaster, $ionicLoading, $cordovaSQLite, $filter) {
+  
   $scope.$on('$ionicView.enter', function(){
     $ionicHistory.clearCache();
     $ionicHistory.clearHistory();
@@ -364,42 +392,63 @@ angular.module('starter.controllers', [])
     return $scope.showButtons = !$scope.showButtons;
   }
 
-    if(!localStorage.getItem('loggedin_name')){   
-      //if not logged in
-      $state.go('app.welcome', {}, {location: "replace", reload: true});
-      var alertPopup = $ionicPopup.alert({
-        title: 'Error!',
-        template: 'Please login first!'
-      });
+  $scope.periods = [];
+  var query = "SELECT * FROM periods where user_id=? ORDER BY id DESC";
+  $cordovaSQLite.execute(db, query, [$scope.loggedin_id]).then(function(result){
+    console.log(result);
+    if(result.rows.length) {
+      for(var i=0;i<result.rows.length;i++) {
+        $scope.periods.push(result.rows.item(i));
+      }
     } else {
-      //$ionicHistory.clearCache();
-      $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
-      .then(function (response) {
-        $scope.periods = response.data;
-        console.log($scope.periods);
-      },
-      function(error) {
-        $scope.error = error;
-        var alertPopup = $ionicPopup.alert({
-          title: 'Error',
-          template: $scope.error
-        });
-      });
+      console.log('no data');
     }
+  }, function(error){
+    console.log('error: '+error);
+  });
+
+  // $ionicHistory.clearCache().then(function () {
+  //   if(!localStorage.getItem('loggedin_name')){   
+  //     //if not logged in
+  //     $ionicLoading.hide();
+  //     $state.go('app.welcome', {}, {location: "replace", reload: true});
+  //     var alertPopup = $ionicPopup.alert({
+  //       title: 'Error!',
+  //       template: 'Please login first!'
+  //     });
+  //   } else {
+  //     $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
+  //     .then(function (response) {
+  //       $scope.periods = response.data;
+  //       console.log($scope.periods);
+  //       $ionicLoading.hide();
+  //       console.log("ionicLoading has been hid!");
+  //     },
+  //     function(error) {
+  //       $ionicLoading.hide();
+  //       $scope.error = error;
+  //       var alertPopup = $ionicPopup.alert({
+  //         title: 'Error',
+  //         template: $scope.error
+  //       });
+  //     });
+  //   }
+  // });
+    
 
     // refresh it
-    $scope.doRefresh = function() {
+    $scope.doRefreshPL = function() {
       console.log('Refreshing!');
-      $scope.$on('$ionicView.enter', function() {
-        $ionicHistory.clearCache();
-        $ionicHistory.clearHistory();
+      $ionicHistory.clearCache();
+      $ionicHistory.clearHistory();
+      $ionicHistory.clearCache().then(function () {
+        $timeout( function() {
+          $ionicHistory.clearCache([$state.current.name]).then(function() {
+            $state.reload();
+          });
+          $scope.$broadcast('scroll.refreshComplete');
+        }, 1000);
       });
-      $timeout( function() {
-        $ionicHistory.clearCache([$state.current.name]).then(function() {
-          $state.reload();
-        });
-        $scope.$broadcast('scroll.refreshComplete');
-      }, 1000);
     };
     // refresh it
 
@@ -413,12 +462,14 @@ angular.module('starter.controllers', [])
     // Triggered in the edit modal to close it
     $scope.closeEditPeriod = function() {
       $scope.modalEditPeriod.hide();
-      $state.go('app.welcome', {}, {location: "replace", reload: true});
+      //$state.go('app.welcome', {}, {location: "replace", reload: true});
     };
     // Open the edit modal
     $scope.editPeriod = function(period) {
       $scope.modalEditPeriod.show();
-      $scope.formSubmission = period;
+      $scope.formSubmissionForUpdate = period;
+      $scope.formSubmissionForUpdate.start = $filter('date')(new Date($scope.formSubmissionForUpdate.start), "MMMM dd, yyyy");
+      $scope.formSubmissionForUpdate.end = $filter('date')(new Date($scope.formSubmissionForUpdate.end), "MMMM dd, yyyy");
       $timeout(function () {
         ionicMaterialInk.displayEffect();
         ionicMaterialMotion.ripple();
@@ -432,43 +483,50 @@ angular.module('starter.controllers', [])
         destructiveText: '<i class="icon ion-trash-a"></i> Delete',
         cancelText: '<i class="icon ion-close"></i> Cancel',
         cancel: function() {
-          console.log('Canceled!');
+          //console.log('Canceled!');
         },
         destructiveButtonClicked: function() {
-          //console.log('Deleted!');
+          $ionicLoading.show({ template: '<center><div class="loader"></div><br/>তথ্য হালনাগাদ হচ্ছে...</center>', noBackdrop: false, delay: 100 });
           $scope.periodToDelete = period;
-          console.log($scope.periodToDelete);
-          $http.get("http://orbachinujbuk.com/ionic_server/deleteperiod.php?user_id="+$scope.loggedin_id+"&id="+$scope.periodToDelete.id)
-          .then(function (response) {
-            $scope.deleted = response.data.result;
+
+          // delete from server
+          $http.get("http://orbachinujbuk.com/ionic_server/deleteperiod.php?uniquekey="+$scope.periodToDelete.uniquekey)
+          .success(function (data, status) {
+            $scope.deleted = data.result;
             console.log($scope.deleted);
             if($scope.deleted.deleted == 1) {
-              $scope.successToast('SUCCESS', 'Data deleted successfully!');
+              var query = "DELETE from periods WHERE uniquekey=?";
+              $cordovaSQLite.execute(db, query, [$scope.periodToDelete.uniquekey]);
+              console.log('Deleted!');
+              $scope.successToast('SUCCESS', 'তথ্য মুছে দেওয়া হয়েছে!');
+              $ionicLoading.hide();
+              $state.go('app.periodlist', {}, {location: "replace", reload: true});
             } else {
               $scope.errorToast('ERROR', 'Data could not be deleted!');
+              $ionicLoading.hide();
             }
-            $state.go('app.welcome', {}, {location: "replace", reload: true});
-          },
-          function(error) {
-            $scope.error = error;
-            var alertPopup = $ionicPopup.alert({
-              title: 'Error',
-              template: $scope.error
-            });
+          }).error(function(error, status) {
+            $scope.status = status;
+            if(status <= 0) {
+              var alertPopup = $ionicPopup.alert({
+                title: 'Connection failed!',
+                template: 'Please check your internet connection!'
+              });
+            } else {
+              $scope.errorToast('ERROR', 'Something is wrong! Try again.');
+            }
+            $ionicLoading.hide();
           });
-          return true;
         }
       });
     };
 
-    $timeout(function () {
-      // ionicMaterialInk.displayEffect();
-      // ionicMaterialMotion.ripple();
-      // ionicMaterialMotion.fadeSlideInRight();
-    }, 300);
+    // $timeout(function () {
+    //   $ionicLoading.hide();
+    // }, 3000);
 })
 
-.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state','$filter',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state,$filter) {
+.controller('PeriodCalendarCtrl', ['$scope','$http','$stateParams','$ionicPopup', '$timeout','$state','$filter','$cordovaSQLite',function($scope, $http, $stateParams,$ionicPopup, $timeout, $state,$filter,$cordovaSQLite) {
   // loads value from the loggedin session
   $scope.loggedin_id= localStorage.getItem('loggedin_id');
   $calendar = $('[ui-calendar]');
@@ -502,28 +560,39 @@ angular.module('starter.controllers', [])
     }
   };
   $scope.events = [];
+  $scope.fertility = [];
 
-  $http.get("http://orbachinujbuk.com/ionic_server/getPeriodListForCalender.php?id="+$scope.loggedin_id)
-  .then(function (data) {
-    //console.log(data);
-    $scope.events.slice(0, $scope.events.length);
-    angular.forEach(data.data, function(value){
-      $scope.events.push({
-        title: value.title,
-        start: new Date(value.start),
-        end: new Date(value.end),
-        allDay: false,
-        stick: true,
-        className: 'Rifat' // fertility color will be changed
-      });
-    });
+  var query = "SELECT * FROM periods where user_id=? ORDER BY id DESC";
+  $cordovaSQLite.execute(db, query, [$scope.loggedin_id]).then(function (result) {
+    console.log(result);
+    if(result.rows.length) {
+      for(var i=0;i<result.rows.length;i++) {
+        $scope.events.push({
+          title: result.rows.item(i).description,
+          start: new Date(result.rows.item(i).start),
+          end: new Date(result.rows.item(i).end),
+          allDay: false,
+          stick: true,
+          className: ''
+        });
+        $scope.fertility.push({
+          title: 'Fertile phase',
+          start: moment(new Date(result.rows.item(i).start)).add(9, 'days'),
+          end: moment(new Date(result.rows.item(i).start)).add(16, 'days'),
+          allDay: false,
+          stick: true,
+          className: 'fertility' // fertility color will be changed
+        });
+      }
+    }
   });
   console.log($scope.events);
-  $scope.eventSources = [$scope.events];
+  
+  $scope.eventSources = [$scope.events, $scope.fertility];
 
 }])
 
-.controller('EditPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory) {
+.controller('EditPeriodCtrl', ['$scope', '$http', '$timeout', '$stateParams', 'ionicDatePicker', '$filter', 'ionicMaterialInk','ionicMaterialMotion','toaster','$ionicHistory', '$cordovaSQLite','$ionicLoading','$state','$ionicPopup', function($scope, $http, $timeout,$stateParams, ionicDatePicker, $filter,ionicMaterialInk,ionicMaterialMotion, toaster, $ionicHistory, $cordovaSQLite,$ionicLoading,$state,$ionicPopup) {
   // loads value from the loggedin session
   $scope.loggedin_id= localStorage.getItem('loggedin_id');
   //$scope.formSubmission = {};
@@ -542,7 +611,7 @@ angular.module('starter.controllers', [])
   }, 300);
   var ipObj3 = {
     callback: function (val) {  //Mandatory
-      $scope.formSubmission.start = $filter('date')(val, "MMMM dd, yyyy"); 
+      $scope.formSubmissionForUpdate.start = $filter('date')(val, "MMMM dd, yyyy"); 
     },
     inputDate: new Date(),      //Optional
     sundayFirst: true,          //Optional
@@ -555,7 +624,7 @@ angular.module('starter.controllers', [])
   };
   var ipObj4 = {
     callback: function (val) {  //Mandatory
-      $scope.formSubmission.end = $filter('date')(val, "MMMM dd, yyyy"); 
+      $scope.formSubmissionForUpdate.end = $filter('date')(val, "MMMM dd, yyyy"); 
     },
     inputDate: new Date(),      //Optional
     sundayFirst: true,          //Optional
@@ -568,39 +637,62 @@ angular.module('starter.controllers', [])
   };
   
   $scope.url = 'http://orbachinujbuk.com/ionic_server/updateperiod.php';
+  
   $scope.formsubmitUpdate = function(isValid) {
-      if (isValid) {
-          $http.post($scope.url, {"id":$scope.formSubmission.id,"user_id": $scope.loggedin_id,"startDate": $scope.formSubmission.start, "endDate": $scope.formSubmission.end, "description": $scope.formSubmission.title})
-                  .success(function(data, status) {
-                      console.log($scope.formSubmission.description);
-                      console.log(data.result);
-                      $scope.status = status;
-                      $scope.data = data;
-                      $scope.result = data.result; // Show result from server in our <pre></pre> element
-                      if($scope.result.updated == 1) {
-                        $scope.successToast('SUCCESS', 'Data updated successfully!');
-                      } else {
-                        $scope.warningToast('WARNING', 'Already exists! Try again.');
-                      }
-                      //$state.go('app.welcome', {}, {location: "replace", reload: true});
-                      $scope.closeEditPeriod();
-                      // there will be a redirect from here...
-                      
-                  }).error(function(error, status){
-                      $scope.status = status;
-                      $scope.result = error;
-                      console.log($scope.formSubmission.description);
-                      console.log($scope.result);
-                      console.log($scope.status);
-                      $scope.errorToast('ERROR', 'Something is wrong! Try again.');
-                  });
-      }else{  
-            $scope.result = {"error":"Something is wrong! Try again."};
+    if (isValid) {
+      // NOW post the data on local db
+      $ionicLoading.show({ template: '<center><div class="loader"></div><br/>তথ্য হালনাগাদ হচ্ছে...</center>', noBackdrop: false, delay: 100 });
+      console.log('Doing update period', $scope.formSubmissionForUpdate);
+      $scope.today = $filter('date')(new Date(), "yyyy-MM-dd HH:mm:ss");
+      $scope.start = $filter('date')(new Date($scope.formSubmissionForUpdate.start), "yyyy-MM-dd HH:mm:ss");
+      if($scope.formSubmissionForUpdate.end == undefined) {
+        $scope.formSubmissionForUpdate.end = "January 01, 1970";
       }
+      if($scope.formSubmissionForUpdate.description == undefined) {
+        $scope.formSubmissionForUpdate.description = "";
+      }
+      $scope.end = $filter('date')(new Date($scope.formSubmissionForUpdate.end), "yyyy-MM-dd") + " 23:59:00";    
+
+      // post the data on server
+      $http.post($scope.url, {"uniquekey":$scope.formSubmissionForUpdate.uniquekey,"user_id": $scope.loggedin_id,"startDate": $scope.formSubmissionForUpdate.start, "endDate": $scope.formSubmissionForUpdate.end, "description": $scope.formSubmissionForUpdate.description})
+        .success(function(data, status) {
+            console.log(data.result);
+            $scope.status = status;
+            $scope.data = data;
+            $scope.result = data.result; // Show result from server in our <pre></pre> element
+            if($scope.result.updated == 1) {
+              var query = "UPDATE periods set start=?, end=?, description=?, updated_at=? WHERE uniquekey=?";
+              $cordovaSQLite.execute(db, query, [$scope.start, $scope.end, $scope.formSubmissionForUpdate.description, $scope.today, $scope.formSubmissionForUpdate.uniquekey]);
+              console.log("Done...");
+              $scope.successToast('SUCCESS', 'Data updated successfully!');
+              $scope.closeEditPeriod();
+              $state.go('app.periodlist', {}, {location: "replace", reload: true});
+            } else {
+              $scope.warningToast('WARNING', 'Start date already exists! Try again.');
+              $state.go('app.periodlist', {}, {location: "replace", reload: true});
+              $scope.closeEditPeriod();
+            }
+            $ionicLoading.hide();
+        }).error(function(error, status){
+          $scope.status = status;
+          if(status <= 0) {
+            var alertPopup = $ionicPopup.alert({
+              title: 'Connection failed!',
+              template: 'Please check your internet connection!'
+            });
+          } else {
+            $scope.errorToast('ERROR', 'Something is wrong! Try again.');
+          }
+          $ionicLoading.hide();
+        });          
+    }else{  
+          $scope.result = {"error":"Something is wrong! Try again."};
+          console.log('the problem is here!');
+    }
   }
 }])
 
-.controller('ProfileCtrl', function($scope, $http, $stateParams, ionicMaterialInk,ionicMaterialMotion, $timeout) {
+.controller('ProfileCtrl', function($scope, $http, $stateParams, ionicMaterialInk,ionicMaterialMotion, $timeout, $cordovaSQLite,$ionicHistory, $state) {
   $timeout(function () {
     ionicMaterialInk.displayEffect();
     ionicMaterialMotion.ripple();
@@ -611,19 +703,56 @@ angular.module('starter.controllers', [])
   $scope.loggedin_email = localStorage.getItem('loggedin_email');
   $scope.loggedin_created_at = localStorage.getItem('loggedin_created_at');
  
-  $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
-  .then(function (response) {
-    $scope.periods = response.data;
-    console.log($scope.periods);
-  },
-  function(error) {
-    $scope.error = error;
-    var alertPopup = $ionicPopup.alert({
-      title: 'Error',
-      template: $scope.error
-    });
+  $scope.periodsforPP = [];
+  var query = "SELECT * FROM periods where user_id=? ORDER BY id DESC";
+  $cordovaSQLite.execute(db, query, [$scope.loggedin_id]).then(function(result){
+    console.log(result);
+    if(result.rows.length) {
+      for(var i=0;i<result.rows.length;i++) {
+        $scope.periodsforPP.push(result.rows.item(i));
+      }
+      $scope.periodsforPP[0].start = new Date($scope.periodsforPP[0].start);
+      $scope.periodsforPP[0].created_at = new Date($scope.periodsforPP[0].created_at);
+    } else {
+      console.log('no data');
+    }
+  }, function(error){
+    console.log('error: '+error);
   });
+
+  // $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
+  // .then(function (response) {
+  //   $scope.periods = response.data;
+  //   console.log($scope.periods);
+  // },
+  // function(error) {
+  //   $scope.error = error;
+  //   var alertPopup = $ionicPopup.alert({
+  //     title: 'Error',
+  //     template: $scope.error
+  //   });
+  // });
+
+  // refresh it
+  $scope.doRefreshPP = function() {
+    console.log('Refreshing!');
+    $ionicHistory.clearCache();
+    $ionicHistory.clearHistory();
+    $ionicHistory.clearCache().then(function () {
+      $timeout( function() {
+        $ionicHistory.clearCache([$state.current.name]).then(function() {
+          $state.reload();
+        });
+        $scope.$broadcast('scroll.refreshComplete');
+      }, 1000);
+    });
+  };
+  // refresh it
+
+
+
 })
+
 .controller('AboutCtrl', function($scope, $http, $stateParams, ionicMaterialInk,ionicMaterialMotion, $timeout) {
   $timeout(function () {
     ionicMaterialInk.displayEffect();
@@ -634,7 +763,8 @@ angular.module('starter.controllers', [])
 })
 
 
-.controller('WelcomeCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state, ionicMaterialInk,ionicMaterialMotion,$filter) {
+.controller('WelcomeCtrl', function($scope,$http,$timeout,$rootScope,$ionicHistory,$state, ionicMaterialInk,ionicMaterialMotion,$filter,$cordovaSQLite) {
+  
   $scope.$on('$ionicView.enter', function(){
     $ionicHistory.clearCache();
     $ionicHistory.clearHistory();
@@ -656,22 +786,65 @@ angular.module('starter.controllers', [])
     $rootScope.showHomePageItems = true; 
   }
 
-  // for the notification
-  $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
-  .then(function (response) {
-    $scope.periods = response.data;
-    console.log($scope.periods);
-    $scope.nmpDateRaw = $scope.periods[0].start;
-    $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
-    console.log($filter('date')($scope.nmpDate, "MMMM dd"));
-    $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
-    $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
-  },
-  function(error) {
-    $scope.error = error;
-    var alertPopup = $ionicPopup.alert({
-      title: 'Error',
-      template: $scope.error
+  // for the welcome page notification
+  $scope.periodsforWPN = [];
+  $timeout(function() {
+    var query = "SELECT * FROM periods where user_id=? ORDER BY id DESC Limit 1";
+    $cordovaSQLite.execute(db, query, [$scope.loggedin_id]).then(function(result){
+      console.log(result);
+      if(result.rows.length) {
+        for(var i=0;i<result.rows.length;i++) {
+          $scope.periodsforWPN.push(result.rows.item(i));
+          $scope.nmpDateRaw = result.rows.item(i).start;
+          console.log($scope.nmpDateRaw);
+          $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
+          console.log($filter('date')($scope.nmpDate, "MMMM dd"));
+          $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
+          $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
+        }
+      } else {
+        console.log('no data');
+      }
+    }, function(error){
+      console.log('error: '+error);
     });
-  });
+  }, 1000);
+    
+  
+  
+
+  // $http.get("http://orbachinujbuk.com/ionic_server/getPeriodList.php?id="+$scope.loggedin_id)
+  // .then(function (response) {
+  //   $scope.periods = response.data;
+  //   console.log($scope.periods);
+  //   $scope.nmpDateRaw = $scope.periods[0].start;
+  //   $scope.nmpDate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 28);
+  //   console.log($filter('date')($scope.nmpDate, "MMMM dd"));
+  //   $scope.nfsdate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 9);
+  //   $scope.nfedate = new Date($scope.nmpDateRaw).setDate(new Date($scope.nmpDateRaw).getDate() + 15);
+  // },
+  // function(error) {
+  //   $scope.error = error;
+  //   var alertPopup = $ionicPopup.alert({
+  //     title: 'Error',
+  //     template: $scope.error
+  //   });
+  // });
+  // refresh it
+  $scope.doRefreshWP = function() {
+    console.log('Refreshing!');
+    $ionicHistory.clearCache();
+    $ionicHistory.clearHistory();
+    $ionicHistory.clearCache().then(function () {
+      $timeout( function() {
+        $ionicHistory.clearCache([$state.current.name]).then(function() {
+          $state.reload();
+        });
+        $scope.$broadcast('scroll.refreshComplete');
+      }, 1000);
+    });
+  };
+  // refresh it
+  
+  
 });

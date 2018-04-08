@@ -9,7 +9,6 @@
     "gulp-sass": "^3.1.0"
   },
   "dependencies": {
-    "cordova-android": "^6.2.3",
     "cordova-plugin-app-event": "file:node_modules\\cordova-plugin-app-event",
     "cordova-plugin-autostart": "^2.3.0",
     "cordova-plugin-badge": "^0.8.7",
@@ -23,7 +22,8 @@
     "cordova-sqlite-storage": "^2.3.0",
     "de.appplant.cordova.plugin.local-notification": "^0.8.5",
     "ionic-plugin-keyboard": "^2.2.1",
-    "ionic-toast": "^0.4.1"
+    "ionic-toast": "^0.4.1",
+    "onesignal-cordova-plugin": "^2.3.3"
   },
   "cordova": {
     "plugins": {
@@ -34,10 +34,9 @@
       "ionic-plugin-keyboard": {},
       "de.appplant.cordova.plugin.local-notification": {},
       "cordova-sqlite-storage": {},
+      "onesignal-cordova-plugin": {},
       "cordova-plugin-autostart": {}
     },
-    "platforms": [
-      "android"
-    ]
+    "platforms": []
   }
 }

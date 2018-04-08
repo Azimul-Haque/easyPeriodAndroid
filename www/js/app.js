@@ -12,13 +12,21 @@ easyperiod.run(function($ionicPlatform, $cordovaSQLite) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
+    // onesignal code
+    // window.plugins.OneSignal.setLogLevel({logLevel: 4, visualLevel: 4});
+    var notificationOpenedCallback = function(jsonData) {
+      console.log('notificationOpenedCallback: ' + JSON.stringify(jsonData));
+    };
+    cordova.plugins.autoStart.enable();
+      window.plugins.OneSignal
+      .startInit("68616824-4bac-4630-be22-5c4a0bc9a8f8")
+      .handleNotificationOpened(notificationOpenedCallback)
+      .endInit();
+    // onesignal code
+
     if (window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
-    }
-    if(window.cordova) {
-      // enable the autostart for local notifications
-      cordova.plugins.autoStart.enable();
     }
     
     if (window.StatusBar) {
@@ -37,7 +45,7 @@ easyperiod.run(function($ionicPlatform, $cordovaSQLite) {
     // };
     db = window.openDatabase(database, '1.0', 'sqlitedemo', 2000);
     $cordovaSQLite.execute(db, "CREATE TABLE periods(id integer primary key, user_id integer, start text unique, end text, description text, uniquekey text unique, created_at text, updated_at text)");
-      
+  
   });
 })
 

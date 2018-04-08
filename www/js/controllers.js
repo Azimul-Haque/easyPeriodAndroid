@@ -313,19 +313,19 @@ angular.module('starter.controllers', [])
     console.log("Next probable period: "+$scope.nmpDate_ntfctn+". Ferlity: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn);
     $scope.addNotification1 = function() {
       var alarmTime = new Date();
-      alarmTime.setDate(alarmTime.getDate()+1);
-      alarmTime.setHours(0);
-      alarmTime.setMinutes(0);
-      alarmTime.setSeconds(0);
-      //alarmTime.setMinutes(alarmTime.getMinutes() + 0);
+      // alarmTime.setDate(alarmTime.getDate()+1);
+      // alarmTime.setHours(0);
+      // alarmTime.setMinutes(0);
+      // alarmTime.setSeconds(0);
+      alarmTime.setMinutes(alarmTime.getMinutes() + 0);
       $cordovaLocalNotification.add({
           id: "12341",
           message: "Next probable period: "+$scope.nmpDate_ntfctn,
           title: "EasyPeriod",
           autoCancel: true,
-          sound: null,
+          sound: true,
           firstAt: alarmTime,
-          every: 'day',
+          every: 'minute',
         }).then(function () {
           //console.log("The notification has been set");
       });
@@ -333,19 +333,19 @@ angular.module('starter.controllers', [])
     $scope.addNotification2 = function() {
       // further works need to be done...
       var alarmTime = new Date();
-      alarmTime.setDate(alarmTime.getDate()+1);
-      alarmTime.setHours(0);
-      alarmTime.setMinutes(0);
-      alarmTime.setSeconds(0);
-      //alarmTime.setMinutes(alarmTime.getMinutes() + 0);
+      // alarmTime.setDate(alarmTime.getDate()+1);
+      // alarmTime.setHours(0);
+      // alarmTime.setMinutes(0);
+      // alarmTime.setSeconds(0);
+      alarmTime.setMinutes(alarmTime.getMinutes() + 0);
       $cordovaLocalNotification.add({
           id: "12342",
           message: "Fertility phase: "+$scope.nfsdate_ntfctn +"-"+$scope.nfedate_ntfctn,
           title: "EasyPeriod",
           autoCancel: true,
-          sound: null,
+          sound: true,
           firstAt: alarmTime,
-          every: 'day'
+          every: 'minute'
       }).then(function () {
           //console.log("The notification has been set");
       });

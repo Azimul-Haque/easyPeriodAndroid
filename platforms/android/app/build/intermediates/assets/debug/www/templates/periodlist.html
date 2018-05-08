@@ -1,0 +1,33 @@
+<ion-view view-title="Period List" cache-view="false">
+  <ion-nav-bar class="bar-assertive">
+    <ion-nav-buttons side="left">
+      <button class="button button-icon button-clear ion-navicon-round" menu-toggle="left">
+      </button>
+    </ion-nav-buttons>
+    <ion-nav-buttons side="right">
+      <div class="">
+        <button class="button button-icon button-clear ion-gear-b" ng-click="showButtonSettings()"></button>
+      </div>
+    </ion-nav-buttons>
+    <button menu-close class="button button-fab button-fab-bottom-right button-assertive icon ion-waterdrop waves-effect waves-button waves-light" ui-sref="app.entryperiod"></button>
+  </ion-nav-bar>
+  <ion-content>
+    <ion-refresher on-refresh="doRefreshPL()"></ion-refresher>
+    <ion-list show-delete="showButtons">
+        <ion-item ng-repeat="period in periods"  class="item item-text-wrap  item-button-right">
+          <i class="icon ion-waterdrop assertive"></i> {{ period.start | limitTo: 10 | date: "MMMM dd" }}-{{ period.end | limitTo: 10 | date: "MMMM dd"}}
+            <ion-delete-button class="icon ion-trash-a delete-button ink" ng-click="showDltPrdActnsht(period)"></ion-delete-button>
+            <ion-delete-button class="icon ion-compose edit-button ink" ng-click="editPeriod(period)"></ion-delete-button>
+            <!-- <ion-option-button class="button-assertive"
+                               ng-click="">
+              <i class="icon ion-compose"></i>
+            </ion-option-button>
+            <ion-option-button class="button-calm"
+                               ng-click="">
+                               <i class="icon ion-trash-a"></i>
+            </ion-option-button> -->
+        </ion-item>
+     
+    </ion-list>
+  </ion-content>
+</ion-view>

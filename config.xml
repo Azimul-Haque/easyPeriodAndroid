@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.orbachinujbuk.easyPeriod" version="1.9.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.orbachinujbuk.easyPeriod" version="2.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>easyPeriod</name>
     <description>An awesome Mentrual Period Management App</description>
     <author email="orbachinujbuk@gmail.com" href="http://orbachinujbuk.com/">Team Orbachin Ujbuk</author>
@@ -49,7 +49,7 @@
     <plugin name="cordova-plugin-whitelist" spec="^1.3.1" />
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
     <plugin name="cordova-sqlite-storage" spec="^2.3.0" />
-    <plugin name="onesignal-cordova-plugin" spec="^2.3.3" />
     <plugin name="cordova-plugin-autostart" spec="^2.3.0" />
     <plugin name="de.appplant.cordova.plugin.local-notification" spec="^0.8.5" />
+    <plugin name="onesignal-cordova-plugin" spec="^2.3.3" />
 </widget>

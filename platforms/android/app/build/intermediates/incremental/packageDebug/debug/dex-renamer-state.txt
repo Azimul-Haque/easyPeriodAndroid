@@ -1,0 +1,4 @@
+#Sun May 06 22:45:43 BDT 2018
+base.0=G\:\\django + ionic\\easyPeriod\\platforms\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
+renamed.0=classes.dex
+file.0=G\:\\django + ionic\\easyPeriod\\platforms\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0\\classes.dex

@@ -1,0 +1,26 @@
+<ion-view view-title="Profile">
+    <ion-content>
+        <ion-refresher on-refresh="doRefreshPP()"></ion-refresher>
+        <div class="list card animate-fade-slide-in-right">
+            <div class="item ink">
+                <img class="profile-picture" src="img/demo_user.jpg"><br/>
+                <center><h2>{{ loggedin_name }}</h2>
+                <p>{{ loggedin_email }}</p>
+            </center>
+            </div>
+
+            <div class="item item-body animate-fade-slide-in-right">
+                <span> <b>Joined:</b> {{ loggedin_created_at | limitTo: 10 | date: "MMMM dd, y" }}</span><br/>
+                <span> <b>LMP Date:</b> {{ periodsforPP[0].start | date: "MMMM dd, y" }}</span><br/>
+                <span> <b>Last entry:</b> {{ periodsforPP[0].created_at | date: "MMMM dd, y" }}</span><br/>
+                <span> <b>Total entry:</b> {{ periodsforPP.length }}</span>
+            </div>
+            <div class="item">
+                <a class="button button-block button-calm ink" href="http://orbachinujbuk.com" target="_blank">Profile Settings</a>
+                <a class="button button-block button-calm ink" href="http://orbachinujbuk.com" target="_blank">Change Password</a>
+            </div>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>
+      

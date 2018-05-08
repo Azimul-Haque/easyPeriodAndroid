@@ -1,0 +1,47 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-assertive">
+    <h1 class="title">Register</h1>
+    <div class="buttons">
+      <button class="button button-icon button-clear ion-android-close" ng-click="closeRegister()"></button>
+    </div>
+  </ion-header-bar>
+  <ion-content>
+    <form ng-submit="doRegister(newuser)" name="registerForm">
+      <div class="list">
+        <label class="item item-input item-floating-label">
+          <span class="input-label">Full Name</span>
+          <input type="text" placeholder="Full Name" ng-model="newuser.name" name="name" required>
+          <span style="color:red" ng-show="registerForm.name.$touched && registerForm.name.$invalid">
+            <span ng-show="registerForm.name.$error.required" style="font-size:12px;">Full Name is required.</span>
+          </span>
+        </label>
+        <label class="item item-input item-floating-label">
+          <span class="input-label">Email</span>
+          <input type="email" placeholder="Email" ng-model="newuser.email" name="email" required>
+          <span style="color:red" ng-show="registerForm.email.$touched && registerForm.email.$invalid">
+            <span ng-show="registerForm.email.$error.required" style="font-size:12px;">Email is required.</span>
+            <span ng-show="registerForm.email.$error.email" style="font-size:12px;">Invalid email address.</span>
+          </span>
+        </label>
+        <label class="item item-input item-floating-label">
+          <span class="input-label">Password</span>
+          <input type="password" placeholder="Password" ng-model="newuser.password" name="password" required>
+          <span style="color:red" ng-show="registerForm.password.$touched && registerForm.password.$invalid">
+            <span ng-show="registerForm.password.$error.required" style="font-size:12px;">Password is required.</span>
+          </span>
+        </label>
+        <label class="item item-input item-floating-label">
+          <span class="input-label">Retype Password</span>
+          <input type="password" placeholder="Retype Password" ng-model="newuser.passwordconf" name="passwordconf" ng-pattern="\b{{newuser.password}}\b" required>
+          <span style="color:red" ng-show="registerForm.passwordconf.$touched && registerForm.passwordconf.$invalid">
+            <span ng-show="registerForm.passwordconf.$error.required" style="font-size:12px;">Password confirm is required.</span>
+            <span ng-show="registerForm.passwordconf.$error" style="font-size:12px;">Password does not match.</span>
+          </span>
+        </label>
+        <label class="item">
+          <button class="button button-block button-positive ink" >Register</button>
+        </label>
+      </div>
+    </form>
+  </ion-content>
+</ion-modal-view>

@@ -1,0 +1,46 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-autostart": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-device": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-local-notification": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-splashscreen": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-statusbar": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-x-toast": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-sqlite-storage": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "onesignal-cordova-plugin": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    }
+  },
+  "dependent_plugins": {
+    "cordova-plugin-app-event": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    },
+    "cordova-plugin-badge": {
+      "PACKAGE_NAME": "com.orbachinujbuk.easyPeriod"
+    }
+  }
+}
